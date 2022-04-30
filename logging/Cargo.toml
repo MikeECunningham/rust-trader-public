@@ -1,0 +1,9 @@
+[package]
+name = "logging"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+crossbeam = { version = "0.8.1" }
+crossbeam-channel = { version = "0.5.2" }
+lazy_static = "1.4.0"
