@@ -22,13 +22,21 @@ lazy_static! {
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 enum StratBranch {
+    /// No actives, no inventory
     NNN,
+    /// No actives, have inventory
     NNS,
+    /// No opens, active closes, no inventory; LIKELY ERROR STATE
     NSN,
+    /// No opens, active closes, have inventory
     NSS,
+    /// Active opens, no closes, no inventory
     SNN,
+    /// Active opens, no closes, have inventory
     SNS,
+    /// Active opens, active closes, no inventory; LIKELY ERROR STATE
     SSN,
+    /// Active opens, active closes, have inventory
     SSS
 }
 

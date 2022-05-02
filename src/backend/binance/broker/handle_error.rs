@@ -16,14 +16,14 @@ impl Broker {
     pub fn error(&self, error: &BinanceError) {
         info!("{:?}", error);
         match error.code {
-            ServerNetworkErrors(sne) => self.server_network_error(sne, error.msg.clone()),
-            RequestErrors(re) => self.request_error(re),
-            ProcessingErrors(pe) => self.processing_error(pe),
-            FilterOtherErrors(foe) => self.filter_other_error(foe),
+            ServerNetworkErrors(sne) => self.server_network_error(sne, &error.msg),
+            RequestErrors(re) => self.request_error(re, &error.msg),
+            ProcessingErrors(pe) => self.processing_error(pe, &error.msg),
+            FilterOtherErrors(foe) => self.filter_other_error(foe, &error.msg),
         };
     }
 
-    fn server_network_error(&self, sne: ServerNetworkErrors, msg: String) {
+    fn server_network_error(&self, sne: ServerNetworkErrors, msg: &str) {
         match sne {
             Unknown => todo!(),
             Disconnected => todo!(),
@@ -51,7 +51,7 @@ impl Broker {
         };
     }
 
-    fn request_error(&self, re: RequestErrors) {
+    fn request_error(&self, re: RequestErrors, msg: &str) {
         match re {
             IllegalChars => todo!(),
             TooManyParameters => todo!(),
@@ -82,7 +82,7 @@ impl Broker {
         };
     }
 
-    fn processing_error(&self, pe: ProcessingErrors) {
+    fn processing_error(&self, pe: ProcessingErrors, msg: &str) {
         match pe {
             NewOrderRejected => todo!(),
             CancelRejected => { /*debug!("Cancel Rejected, hopefully this was because of a fill")*/},
@@ -94,7 +94,7 @@ impl Broker {
             MarginNotSufficient => todo!(),
             UnableToFill => todo!(),
             OrderWouldImmediatelyTrigger => todo!(),
-            ReduceOnlyRejected => todo!(),
+            ReduceOnlyRejected => {},
             UserInLiquidation => todo!(),
             PositionNotSufficient => todo!(),
             MaxOpenOrderExceeded => todo!(),
@@ -104,7 +104,7 @@ impl Broker {
         };
     }
 
-    fn filter_other_error(&self, foe: FilterOtherErrors) {
+    fn filter_other_error(&self, foe: FilterOtherErrors, msg: &str) {
         match foe {
             InvalidOrderStatus => todo!(),
             PriceLessThanZero => todo!(),

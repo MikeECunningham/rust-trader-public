@@ -20,7 +20,8 @@ pub struct PortfolioData {
     pub sell: PositionData,
     pub remaining_margin: D128,
     pub remaining_count: D128,
-    // pub delta: PositionData, // Someday lmao
+    // Someday lmao
+    // pub delta: PositionData,
 }
 
 impl Display for PortfolioData {
@@ -41,6 +42,12 @@ impl PortfolioData {
     }
 }
 
+/// An asset position portfolio manages the buy and sell positions for a given traded pair
+/// Each portfolio has a balance of the asset, and a pair of positions
+/// representing both sides of the portfolio.
+/// We also store the balance and historical positions on the portfolio as well.
+/// For each pair, one may maintain separate bearish and bullish positions.
+/// Orders against a pair simply change the delta of the corresponding position side.
 // #[derive(Debug)]
 pub struct Portfolio {
     pub buy: Position,
@@ -225,10 +232,10 @@ impl Portfolio {
         }
     }
 
-    pub fn cancel_distant_rebases(&mut self, top: D128, side: Side, stage: Stage, sender: Sender<StrategyMessage>) -> FindCancelRes {
+    pub fn cancel_distant_rebases(&mut self, top: D128, side: Side, stage: Stage) -> FindCancelRes {
         let r = match side {
-            Side::Buy => self.buy.cancel_distant_rebases(top, self.rebase_distance_limit, stage, sender.clone()),
-            Side::Sell => self.sell.cancel_distant_rebases(top, self.rebase_distance_limit, stage, sender.clone()),
+            Side::Buy => self.buy.cancel_distant_rebases(top, self.rebase_distance_limit, stage),
+            Side::Sell => self.sell.cancel_distant_rebases(top, self.rebase_distance_limit, stage),
         };
         self.data_refresh();
         r

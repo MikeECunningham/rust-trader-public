@@ -109,7 +109,9 @@ impl TryFrom<String> for Side {
 }
 
 impl Side {
-    /// Helps you deside
+    /** Helps you deside
+    * To avoid lifetime muck, it's best to use this when you can immediately consume the response
+    */
     pub fn deside<'a, T>(&self, buy: &'a T, sell: &'a T) -> &'a T {
         match self { Side::Buy => buy, Side::Sell => sell, }
     }

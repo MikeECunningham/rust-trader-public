@@ -20,11 +20,13 @@ use crate::strategy::types::Stage;
 
 use super::AccountMessage;
 use super::CancelResponseContext;
+use super::FindCancelRes;
 use super::ModelMessage;
 use super::OrderResponseContext;
 use super::Portfolio;
 use super::StratBranch;
 use super::StrategyMessage;
+use super::order_list::OrderData;
 
 use tokio::runtime::{Runtime, Builder};
 
@@ -38,7 +40,7 @@ pub const CHIRP_ON_FLIP: bool = true;
 pub const CHIRP_INCLUDES_DATA: bool = true;
 
 lazy_static! {
-    pub static ref REBATE: D128 = D128::from(0.00025);
+    pub static ref REBATE: D128 = D128::from(0.0001);
     pub static ref MAX_OPEN_DIST: D128 = D128::from(30);
     pub static ref TOP_OPEN_DIST: D128 = D128::from(6);
 }
@@ -98,6 +100,10 @@ impl Strategy {
         }
     }
 
+    /** Controls the logic for responding to new best levels on the orderbook.
+     * The general rule is to always have a top level order in play, either entry or exit.
+     * IE: Always seek entry if inventory is 0, always seek exit if inventory > 0.
+     */
     pub fn tops(&mut self, side: Side, tops: Tops) {
         let entry_price = side.deside(&tops.best_bid, &tops.best_ask).0;
         let exit_price = side.deside(&tops.best_ask, &tops.best_bid).0;
@@ -107,7 +113,7 @@ impl Strategy {
                 self.asset_portfolio.new_limit(
                     None,
                     entry_price,
-                    D128::from(0.001),
+                    self.asset_portfolio.init_size,
                     side,
                     Stage::Entry,
                     OrderClassification::Top,
@@ -128,15 +134,37 @@ impl Strategy {
                 self.asset_portfolio.cancel_non_tops(exit_price, side, Stage::Exit);
             },
             StratBranch::SNN => {
-                self.asset_portfolio.cancel_non_tops(entry_price, side, Stage::Entry);
+                match self.asset_portfolio.cancel_non_tops(entry_price, side, Stage::Entry) {
+                    FindCancelRes::Found => {},
+                    FindCancelRes::Cancelled => {},
+                    FindCancelRes::NotFound => {
+                        self.asset_portfolio.new_limit(
+                            None,
+                            entry_price,
+                            self.asset_portfolio.init_size,
+                            side,
+                            Stage::Entry,
+                            OrderClassification::Top,
+                        );
+                    },
+                };
             },
             StratBranch::SNS => {
+                let exit_size = side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_position.inv;
+                self.asset_portfolio.new_limit(
+                    None,
+                    exit_price,
+                    exit_size,
+                    side,
+                    Stage::Exit,
+                    OrderClassification::Top,
+                );
             },
             StratBranch::SSS => {
                 self.asset_portfolio.cancel_non_tops(exit_price, side, Stage::Exit);
             },
             StratBranch::NSN | StratBranch::SSN => {
-                // Probable error case: open positions with no inventory
+                // Probable error case: active closes with no inventory
                 println!("{} SSN pdata: {}", match side { Side::Buy => self.asset_portfolio.data.buy, Side::Sell => self.asset_portfolio.data.sell, }, side);
                 let (position, converse_position) = match side {Side::Buy => ( &mut self.asset_portfolio.buy, &mut self.asset_portfolio.sell), Side::Sell => ( &mut self.asset_portfolio.sell, &mut self.asset_portfolio.buy) };
                 panic!("POSSIBLE DESYNC: CLOSING ORDERS RESTING WITH EMPTY POSITION: {:?}", position);
@@ -144,8 +172,89 @@ impl Strategy {
         }
     }
 
+    /** The strategy's response to order book updates.
+     * Commissions mean entering with a cost basis better than the entry price
+     * This permits neutralizing the cost basis during a sweep
+     * The main goal of this function is to demonstrate a simple ladder of orders which maintain a pnl >= 0
+     */
     pub fn orderbook(&mut self, side: Side, ob: BookResult) {
+        let entry_price = side.deside(&ob.best_bid, &ob.best_ask).0;
+        let exit_price = side.deside(&ob.best_ask, &ob.best_bid).0;
+        let rebate = match side {
+            Side::Buy => D128::ONE - *REBATE,
+            Side::Sell => D128::ONE + *REBATE,
+        };
 
+        match self.resolve_strat_branch(side) {
+            StratBranch::NNN => {
+                // Wait for tops
+            },
+            StratBranch::NNS => {
+                // Wait for tops
+            },
+            StratBranch::NSS => {
+                // Wait for tops
+            },
+            StratBranch::SNN => {
+                match self.asset_portfolio.get_top_data(side, Stage::Entry) {
+                    Some(top) => {
+                        match self.asset_portfolio.cancel_distant_rebases(top.neutral_cb(rebate),
+                        side, Stage::Entry) {
+                            FindCancelRes::Found => {},
+                            FindCancelRes::Cancelled => {},
+                            FindCancelRes::NotFound => {
+                                while self.asset_portfolio.new_limit(
+                                    None,
+                                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell)
+                                        .neutral_cb(rebate, side),
+                                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_liqs.total_outstanding.inv,
+                                    side,
+                                    Stage::Entry,
+                                    OrderClassification::Rebase,
+                                ) {}
+                            },
+                        }
+                    },
+                    None => {
+                        let mut od = OrderData::new();
+                        od.update(
+                            self.asset_portfolio.init_size,
+                            self.asset_portfolio.init_size * entry_price,
+                            self.asset_portfolio.init_size * entry_price * *REBATE
+                        );
+                        self.asset_portfolio.cancel_distant_rebases(od.neutral_cb(rebate), side, Stage::Entry);
+                    },
+                }
+            },
+            StratBranch::SNS => {
+                while self.asset_portfolio.new_limit(
+                    None,
+                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell)
+                        .neutral_cb(rebate, side),
+                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_liqs.total_outstanding.inv,
+                    side,
+                    Stage::Entry,
+                    OrderClassification::Rebase,
+                ) {}
+            },
+            StratBranch::SSS => {
+                while self.asset_portfolio.new_limit(
+                    None,
+                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell)
+                        .neutral_cb(rebate, side),
+                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_liqs.total_outstanding.inv,
+                    side,
+                    Stage::Entry,
+                    OrderClassification::Rebase,
+                ) {}
+            },
+            StratBranch::NSN | StratBranch::SSN => {
+                // Probable error case: active closes with no inventory
+                println!("{} SSN pdata: {}", match side { Side::Buy => self.asset_portfolio.data.buy, Side::Sell => self.asset_portfolio.data.sell, }, side);
+                let (position, converse_position) = match side {Side::Buy => ( &mut self.asset_portfolio.buy, &mut self.asset_portfolio.sell), Side::Sell => ( &mut self.asset_portfolio.sell, &mut self.asset_portfolio.buy) };
+                panic!("POSSIBLE DESYNC: CLOSING ORDERS RESTING WITH EMPTY POSITION: {:?}", position);
+            },
+        }
     }
 
     pub fn tradeflow_update(&mut self, tr: TradeResult) {
@@ -153,9 +262,9 @@ impl Strategy {
     }
 
     pub fn orderbook_update(&mut self, br: BookResult) {
-        // info!("{}", br.test_timer.elapsed().as_nanos());
         self.orderbook(Side::Buy, br);
         self.orderbook(Side::Sell, br);
+        // info!("{}", br.test_timer.elapsed().as_nanos());
     }
 
     pub fn tops_update(&mut self, tops: Tops) {
@@ -183,6 +292,7 @@ impl Strategy {
         self.asset_portfolio.cancel_response(cr.id, cr.side, cr.stage, cr.rest_response);
     }
 
+    /// Quick and dirty debug outputs
     fn chirp(&mut self, branch: StratBranch, side: Side) -> bool {
         match CHIRP {
             true => match CHIRP_ON_FLIP {
@@ -212,7 +322,11 @@ impl Strategy {
         }
     }
 
+    /** Breaks down the position into one of nine states, for whether or not open orders and close orders are active, and
+        whether or not a position is open. StratBranch represents these states in Option style: N for None, S for Some.
+    */
     fn resolve_strat_branch(&mut self, side: Side) -> StratBranch {
+        // 
         if side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_liqs.total_reserved.count < D128::ZERO ||
         side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).close_liqs.total_reserved.count < D128::ZERO {
             panic!("reserve count dropped below 0");

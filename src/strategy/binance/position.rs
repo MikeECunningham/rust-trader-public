@@ -196,7 +196,7 @@ impl Position {
         }
     }
 
-    pub fn cancel_distant_rebases(&mut self, top: D128, limit: D128, stage: Stage, sender: Sender<StrategyMessage>) -> FindCancelRes {
+    pub fn cancel_distant_rebases(&mut self, top: D128, limit: D128, stage: Stage) -> FindCancelRes {
         let mut found_rebases = FindCancelRes::NotFound;
         match self.get_best_rebase_price(stage) {
             Some(b) => {
@@ -206,7 +206,7 @@ impl Position {
                     .filter(|(_, ord)| ord.order_class == OrderClassification::Rebase && ord.can_cancel()) {
                         found_rebases = FindCancelRes::Cancelled;
 
-                        Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), sender.clone());
+                        Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
                     }
                 }
                 found_rebases
@@ -283,11 +283,11 @@ impl Position {
                     let prebate = pd.open_liqs.filled.liq - pd.close_liqs.filled.liq;
                     let rebate = pd.open_liqs.filled.rebate + pd.close_liqs.filled.rebate;
                     let pnl = prebate - rebate;
-                    info!("{}side CLOSED OUT: prebate pnl: {}, fee/rebates: {}, pnl: {}\n{}\n\n",
-                    self.side, pd, prebate, rebate, pnl);
+                    info!("{}side CLOSED OUT: prebate pnl: {}, fee/rebates: {}, pnl: {}\n",
+                    self.side, prebate, rebate, pnl);
                     self.opens.clean();
                     self.closes.clean();
-                    info!("post clean: {}", self.data_refresh());
+                    // info!("post clean: {}", self.data_refresh());
                 }
             },
         };

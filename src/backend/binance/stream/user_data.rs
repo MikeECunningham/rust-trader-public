@@ -43,6 +43,7 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
     rt.spawn(async move {
         loop {
             thread::sleep(Duration::from_secs(3300));
+            get_key().await;
         }
     });
     rt.spawn(async move {
