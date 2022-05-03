@@ -108,7 +108,7 @@ impl Broker {
             .text()
             .await
             .expect("err");
-        // info!("{}", timer.elapsed().as_millis());
+        info!("order ping: {}", timer.elapsed().as_millis());
         let wrapper = serde_json::from_str::<OrderResponseWrapper>(&order_res).expect("serde err binance market res");
         match &wrapper {
             OrderResponseWrapper::Order(_) => {},
