@@ -3,4 +3,5 @@
 .env.bat
 .env_prod.bat
 .env_test.bat
+.env_test.sh
 /BTCUSDT2021-11-25.csv
