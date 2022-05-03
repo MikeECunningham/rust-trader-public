@@ -103,6 +103,7 @@ pub struct Order {
     pub order_type: OrderType,
     pub order_class: OrderClassification,
     pub progress: OrderProgress,
+    pub unknown_cancel_counter: usize,
 }
 
 impl From<OrderUpdateData> for Order {
@@ -323,6 +324,12 @@ impl Order {
 
     pub fn fail_cancel_response(&mut self, error: BinanceError) {
         self.cancel_in_flight = false;
+        if error.msg.contains("Unknown order sent") {
+            self.unknown_cancel_counter += 1;
+            if self.unknown_cancel_counter > 10 {
+                panic!("possible desync: too many failed cancels, crashing.");
+            }
+        }
     }
 
     pub fn new_taker(
@@ -353,6 +360,7 @@ impl Order {
             cum_fee: D128::ZERO,
             progress: OrderProgress::Init,
             order_class: class,
+            unknown_cancel_counter: 0,
         }
     }
 
