@@ -193,6 +193,10 @@ impl Portfolio {
     }
 
     pub fn cancel_response(&mut self, id: Uuid, side: Side, stage: Stage, cancel: CancelResponseWrapper) {
+        match cancel {
+            CancelResponseWrapper::Cancel(_) => {},
+            CancelResponseWrapper::Error(_) => {debug!("cancel err\n{}", self.data);},
+        };
         match side {
             Side::Buy => self.buy.rest_cancel(stage, id, cancel),
             Side::Sell => self.sell.rest_cancel(stage, id, cancel),

@@ -326,8 +326,9 @@ impl Order {
         self.cancel_in_flight = false;
         if error.msg.contains("Unknown order sent") {
             self.unknown_cancel_counter += 1;
-            if self.unknown_cancel_counter > 10 {
+            if self.unknown_cancel_counter > 3 {
                 panic!("possible desync: too many failed cancels, crashing.");
+                // self.progress = OrderProgress::Failed
             }
         }
     }

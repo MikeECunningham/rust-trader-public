@@ -198,8 +198,7 @@ impl Strategy {
             StratBranch::SNN => {
                 match self.asset_portfolio.get_top_data(side, Stage::Entry) {
                     Some(top) => {
-                        match self.asset_portfolio.cancel_distant_rebases(top.neutral_cb(rebate),
-                        side, Stage::Entry) {
+                        match self.asset_portfolio.cancel_distant_rebases(top.neutral_cb(rebate), side, Stage::Entry) {
                             FindCancelRes::Found => {},
                             FindCancelRes::Cancelled => {},
                             FindCancelRes::NotFound => {
@@ -207,7 +206,8 @@ impl Strategy {
                                     None,
                                     side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell)
                                         .neutral_cb(rebate, side),
-                                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_liqs.total_outstanding.inv,
+                                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell)
+                                        .open_liqs.total_outstanding.inv,
                                     side,
                                     Stage::Entry,
                                     OrderClassification::Rebase,
