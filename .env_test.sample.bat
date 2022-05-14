@@ -1,8 +1,14 @@
+set ENV=TEST
 set BYBIT_KEY=
 set BYBIT_SECRET=
 set BYBIT_PERPETUALS_URL=wss://stream-testnet.bybit.com/realtime_public
 set BYBIT_PERPETUALS_PRIVATE_URL=wss://stream-testnet.bybit.com/realtime_private
 set BYBIT_REST_URL=https://api-testnet.bybit.com
+set PHEMEX_KEY=
+set PHEMEX_SECRET=
+set PHEMEX_PERPETUALS_URL=
+set PHEMEX_PERPETUALS_PRIVATE_URL=
+set PHEMEX_REST_URL=
 set BINANCE_KEY=
 set BINANCE_SECRET=
 set BINANCE_PERPETUALS_URL=wss://stream.binancefuture.com

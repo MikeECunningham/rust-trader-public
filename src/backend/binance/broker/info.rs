@@ -27,7 +27,7 @@ impl Broker {
             .text()
             .await
             .unwrap();
-        info!("time {}", time);
+        info!("binance time {}", time);
         serde_json::from_str::<ServerTimeResponse>(&time).expect("server time error").server_time
     }
 }
