@@ -6,5 +6,5 @@
 -REST and websocket connectors are kept in src/backend.  
 
 This project makes use of the dec library  
- https://docs.rs/dec/latest/dec/#  
- It is provided in src/dec with modifications under its original license to solve a number of internal problems with using it as a crate.
+https://docs.rs/dec/latest/dec/#  
+It is provided in src/dec with modifications under its original license to solve a number of internal problems with using it as a crate.
