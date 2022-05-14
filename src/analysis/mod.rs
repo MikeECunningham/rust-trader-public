@@ -5,6 +5,7 @@
 use std::time::Instant;
 use crate::orderbook::{OrderBook, OrderBookValue, Tops};
 use crate::tradeflow::TradeFlow;
+pub mod stats;
 
 use dec::D128;
 

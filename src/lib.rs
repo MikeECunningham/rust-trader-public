@@ -15,7 +15,6 @@ pub mod orderbook;
 pub mod backend;
 pub mod tradeflow;
 pub mod strategy;
-pub mod stats;
 pub mod signal_handler;
 pub mod config;
 

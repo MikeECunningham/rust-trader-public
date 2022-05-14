@@ -2,11 +2,11 @@ use dec::D128;
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
 
+use crate::analysis::stats::RegularStats;
 use crate::backend::binance::types::{Orders, BookRefresh, BestLevel, BinanceSide};
 use crate::backend::bybit::stream::{OBTickData, BybitTickTypes};
 use crate::backend::types::Exchange;
 
-use super::stats::RegularStats;
 use serde::ser::{Serialize, SerializeMap, SerializeStruct, Serializer};
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;

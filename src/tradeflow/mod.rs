@@ -7,11 +7,11 @@ use std:: time::Instant;
 
 use std::collections::{VecDeque};
 
+use crate::analysis::stats::{RegularStats, NormalStats};
 use crate::backend::binance::types::FuturesTrades;
 use crate::backend::bybit::broker::Side;
 use crate::backend::bybit::stream::TradeData;
 use crate::backend::types::Exchange;
-use crate::stats::{NormalStats, RegularStats};
 
 #[derive(Copy, Clone)]
 pub struct OrderValue {
