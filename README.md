@@ -21,3 +21,5 @@ The implementation of insightful analysis and profitable strategies is left as a
 This project makes use of the dec library  
  https://docs.rs/dec/latest/dec/#  
  It is provided in src/dec with modifications under its original license to solve a number of internal problems with using it as a crate.
+
+I have no professional experience in algotrading, and am entirely self taught. I offer no assurance that the tools and systems I have developed are up to any known standard or in line with any obvious convenience.
