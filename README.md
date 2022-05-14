@@ -1,5 +1,5 @@
 # RUST ALGOTRADER
-A decently performant algorithmic trading system for crypto exchanges, built from the ground up as a personal project to help me and my friend explore the space. This project is a demonstration version of a private project and has had content redacted. It is incomplete, requiring additional API connections, stability fixes, account behaviors, documentation, and organization/scaffolding.
+A decently performant algorithmic trading system for crypto exchanges, built from the ground up as a personal project to help me and my friend explore the space. This project is a demonstration version of a private project and has had content redacted. It makes no claim to completeness, requiring fleshed-out API connections, stability fixes, account behaviors, documentation, and organization/scaffolding.
 ### Use at your own risk.
 The implementation of insightful analysis and profitable strategies is left as an exercise to the reader.
 
@@ -21,3 +21,5 @@ The implementation of insightful analysis and profitable strategies is left as a
 This project makes use of the dec library  
  https://docs.rs/dec/latest/dec/#  
  It is provided in src/dec with modifications under its original license to solve a number of internal problems with using it as a crate.
+
+I have no professional experience in algotrading, and am entirely self taught. I offer no assurance that the tools and systems I have developed are up to any known standard or in line with any obvious convenience.
