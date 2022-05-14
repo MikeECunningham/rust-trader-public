@@ -1,6 +1,6 @@
-### RUST ALGOTRADER
+# RUST ALGOTRADER
 A decently performant algorithmic trading system for crypto exchanges, built from the ground up as a personal project to help me and my friend explore the space. This project is a demonstration version of a private project and has had content redacted. It is incomplete, requiring additional API connections, stability fixes, account behaviors, documentation, and organization/scaffolding.
-# Use at your own risk.
+### Use at your own risk.
 The implementation of insightful analysis and profitable strategies is left as an exercise to the reader.
 
 ## Quickstart (for Binance testnet)
