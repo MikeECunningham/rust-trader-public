@@ -156,7 +156,6 @@ impl Portfolio {
         else if size.is_zero() { panic!("size is zero, dump: {}\n{:?}\n{:?}", self.data, self.buy, self.sell); }
         match side {
             Side::Buy => {
-                info!("port buy");
                 let r = self.buy.new_market(id, expected_price, size, stage, class, self.data.buy.remaining_margin, self.data.buy.remaining_count);
                 self.data_refresh();
                 r
