@@ -12,3 +12,7 @@ The implementation of insightful analysis and profitable strategies is left as a
 6. Run `cargo run --release`
 
 Further info can be found in directory readme's.
+
+
+### DISCLAIMER
+I have no professional experience in algotrading, and am entirely self taught. I offer no assurance that the tools and systems I have developed are up to any known standard or in line with any obvious convenience.
