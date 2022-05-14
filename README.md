@@ -12,7 +12,7 @@ The implementation of insightful analysis and profitable strategies is left as a
 6. Run `cargo run --release`
 
 ## General Info
-The trader maintains two primary threads: market modelling (src/signal_handler), and account modelling/strategy (src/strategy).
+The trader maintains two primary threads: market modelling (src/signal_handler), and account modelling/strategy (src/strategy).  
 The market thread pipeline is to receive market updates from REST/websocket threads, update respective models, generate an analysis result, and push it to the strategy thread.
 Order book and trade flow models are kept in the src/orderbook and src/tradeflow folders. Analysis can be found in src/analysis.
 The strategy thread pipeline is to update account models with account and order updates, and execute orders with market model updates.
