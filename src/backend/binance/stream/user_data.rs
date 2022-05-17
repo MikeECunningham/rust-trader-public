@@ -17,7 +17,7 @@ use crate::strategy::binance::{StrategyMessage, AccountMessage};
 
 pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage>) {
     let key = get_key().await;
-    let url = format!("{}:9443/ws/{}", CONFIG.binance_perpetuals_url.clone(), key);
+    let url = format!("{}/ws/{}", CONFIG.binance_perpetuals_url.clone(), key);
     info!("url {}", url);
     let (ws_stream, res) = connect_async(url)
         .await
