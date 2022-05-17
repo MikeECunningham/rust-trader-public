@@ -16,7 +16,7 @@ impl Broker {
             receive_window: 5000,
             timestamp: self.calculate_server_time().expect("Failed to calculate server time"),
         }.get_signed_data(self.auth.secret.clone()).expect("Sign error");
-        info!("req: {}", req);
+        info!("can req: {}", req);
         let timer = Instant::now();
         let cancel_res = self.client
             .delete(format!("{}/fapi/v1/order?{}", self.auth.url, req))
@@ -28,7 +28,7 @@ impl Broker {
             .text()
             .await
             .expect("err");
-        info!("{}\n{}", cancel_res, timer.elapsed().as_millis());
+        info!("can res: {}\ncan ping: {}", cancel_res, timer.elapsed().as_millis());
         let wrapper = serde_json::from_str::<CancelResponseWrapper>(&cancel_res).expect("serde err binance market res");
         match &wrapper {
             CancelResponseWrapper::Cancel(_) => {},
