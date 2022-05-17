@@ -10,7 +10,7 @@ The implementation of insightful analysis and profitable strategies is left as a
 5. Run either `.env.bat` or `source .env.sh`
 6. Run `cargo run --release`
 
-Further info can be found in directory readme's.
+Further info can be found in directory READMEs.
 
 
 ### DISCLAIMER
