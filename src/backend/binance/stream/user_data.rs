@@ -33,16 +33,18 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
     let rt = Runtime::new().expect("Failed to create runtime");
     // The user data stream doesn't send its own pings, so yes, THIS pattern again.
     rt.spawn(async move {
+        let mut interval = time::interval(Duration::from_secs(270));
         loop {
-            thread::sleep(Duration::from_secs(270));
+            interval.tick().await;
             if ping_send.send(WebsocketMessager::Ping()).await.is_err() {
                 panic!("something went wrong sending private ping to main ws thread");
             }
         }
     });
     rt.spawn(async move {
+        let mut interval = time::interval(Duration::from_secs(3300);
         loop {
-            thread::sleep(Duration::from_secs(3300));
+            interval.tick().await;
             get_key().await;
         }
     });

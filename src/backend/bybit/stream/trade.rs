@@ -37,8 +37,9 @@ pub async fn connect_trade(sender: Sender<Signal>) {
 
     let rt = Runtime::new().expect("Failed to create runtime");
     rt.spawn(async move {
+        let mut interval = time::interval(Duration::from_millis(25000));
         loop {
-            thread::sleep(Duration::from_millis(25000));
+            interval.tick().await;
             if ping_send.send(WebsocketMessager::Ping()).await.is_err() {
                 panic!("something went wrong sending private ping to main ws thread");
             }
