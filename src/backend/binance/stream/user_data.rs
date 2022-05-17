@@ -31,7 +31,7 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
     let msg_send = send.clone();
 
     let rt = Runtime::new().expect("Failed to create runtime");
-    // The user data stream doesn't send its own pings, so yes, THIS pattern again.
+    // The user data stream doesn't send its own pings, so we'll need a timer of our own
     rt.spawn(async move {
         loop {
             thread::sleep(Duration::from_secs(270));
