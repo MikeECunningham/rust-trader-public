@@ -266,8 +266,8 @@ impl Strategy {
     }
 
     pub fn orderbook_update(&mut self, br: BookResult) {
-        self.orderbook(Side::Buy, br);
-        self.orderbook(Side::Sell, br);
+        // self.orderbook(Side::Buy, br);
+        // self.orderbook(Side::Sell, br);
         // info!("{}", br.test_timer.elapsed().as_nanos());
     }
 
