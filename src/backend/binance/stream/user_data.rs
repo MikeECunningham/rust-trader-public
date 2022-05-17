@@ -23,7 +23,8 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
         .await
         .expect("error building stream");
     info!("ud res: {:?}", res);
-    if !(res.status().is_informational() || res.status().is_success()) { panic!("panic stream: {:?}\nres: {:?}", ws_stream, res); }
+    if res.status().is_informational() { panic!("information status in ud, stream: {:?}\nres: {:?}", ws_stream, res); }
+    else if !res.status().is_success() { panic!("panic stream: {:?}\nres: {:?}", ws_stream, res); }
 
     let (mut write, mut read) = ws_stream.split();
 
@@ -134,7 +135,7 @@ async fn get_key() -> String {
         .expect("error receiving key response")
         .text()
         .await
-        .expect("error getting ob snap response text");
+        .expect("error getting key response text");
     info!("ud key: {}", key);
     serde_json::from_str::<Key>(&key).expect("error deserializing listen key res").listen_key
 }
