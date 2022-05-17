@@ -280,7 +280,7 @@ impl Strategy {
     }
 
     pub fn order_update(&mut self, oud: OrderUpdateData) {
-        info!("{:?}", oud);
+        info!("UPDATE {:?}", oud);
         self.asset_portfolio.order_update(oud);
     }
 
