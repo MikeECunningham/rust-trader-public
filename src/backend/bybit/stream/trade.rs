@@ -12,6 +12,7 @@ use crate::backend::bybit::stream::WebsocketMessager;
 use crate::backend::bybit::stream::WebsocketPing;
 use crate::backend::bybit::stream::WebsocketSubscribe;
 use crate::config::CONFIG;
+use tokio::time;
 
 pub async fn connect_trade(sender: Sender<Signal>) {
     let stream =  BybitStream::new();

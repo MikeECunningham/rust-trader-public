@@ -42,7 +42,7 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
         }
     });
     rt.spawn(async move {
-        let mut interval = time::interval(Duration::from_secs(3300);
+        let mut interval = time::interval(Duration::from_secs(3300));
         loop {
             interval.tick().await;
             get_key().await;
