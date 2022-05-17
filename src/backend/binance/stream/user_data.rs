@@ -68,6 +68,7 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
                 match m {
 
                     Message::Text(txt) => {
+                        info!("ud stream {}", txt);
                         if txt.contains("ORDER_TRADE_UPDATE") {
                             let ud = serde_json::from_str::<UserStreamWrapper<OrderUpdateData>>(&txt.to_string()).expect("Deser UD went wrong");
                             sender.send(StrategyMessage::AccountMessage(AccountMessage::OrderUpdate(ud.data))).expect("err sending od out of ws");
