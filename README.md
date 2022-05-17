@@ -1,6 +1,5 @@
 # RUST ALGOTRADER
-A decently performant algorithmic trading system for crypto exchanges, built from the ground up as a personal project to help me and my friend explore fintech and learn Rust. This project is a demonstration version of a private project and has had content redacted. It makes no claim to completeness, requiring fleshed-out API connections, stability fixes, account behaviors, documentation, and organization/scaffolding.
-### Use at your own risk.
+A decently performant algorithmic trading system for crypto exchanges, built from the ground up as a personal project to help me and my friend explore fintech and learn Rust. This project is a demonstration version of a private endeavour and has had content redacted.  
 The implementation of insightful analysis and profitable strategies is left as an exercise to the reader.
 
 ## Quickstart (for Binance testnet)
@@ -11,8 +10,9 @@ The implementation of insightful analysis and profitable strategies is left as a
 5. Run either `.env.bat` or `source .env.sh`
 6. Run `cargo run --release`
 
-Further info can be found in directory readme's.
+Further info can be found in directory READMEs.
 
 
 ### DISCLAIMER
-I have no professional experience in algotrading, and am entirely self taught. I offer no assurance that the tools and systems I have developed are up to any known standard or in line with any obvious convenience.
+I have no professional experience in algotrading, and am entirely self taught. This project is incomplete, lacks comprehensive testing, and contains unresolved bugs. I offer no assurance that the tools and systems I have developed are up to any known standard or in line with any obvious convenience.
+### Use at your own risk.
