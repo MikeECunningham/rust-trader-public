@@ -1,5 +1,5 @@
 # RUST ALGOTRADER
-A decently performant algorithmic trading system for crypto exchanges, built from the ground up as a personal project to help me and my friend explore fintech and learn Rust. This project is a demonstration version of a private endeavour and has had content redacted.
+A decently performant algorithmic trading system for crypto exchanges, built from the ground up as a personal project to help me and my friend explore fintech and learn Rust. This project is a demonstration version of a private endeavour and has had content redacted.  
 The implementation of insightful analysis and profitable strategies is left as an exercise to the reader.
 
 ## Quickstart (for Binance testnet)
