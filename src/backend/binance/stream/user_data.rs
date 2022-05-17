@@ -135,6 +135,7 @@ async fn get_key() -> String {
         .text()
         .await
         .expect("error getting ob snap response text");
+    info!("ud key: {}", key);
     serde_json::from_str::<Key>(&key).expect("error deserializing listen key res").listen_key
 }
 
