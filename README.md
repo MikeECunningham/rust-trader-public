@@ -14,5 +14,5 @@ Further info can be found in directory READMEs.
 
 
 ### DISCLAIMER
-I have no professional experience in algotrading, and am entirely self taught. This project is incomplete, relatively untested, and contains unresolved bugs. I offer no assurance that the tools and systems I have developed are up to any known standard or in line with any obvious convenience.
+I have no professional experience in algotrading, and am entirely self taught. This project is incomplete, lacks comprehensive testing, and contains unresolved bugs. I offer no assurance that the tools and systems I have developed are up to any known standard or in line with any obvious convenience.
 ### Use at your own risk.
