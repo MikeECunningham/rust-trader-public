@@ -16,15 +16,13 @@ use crate::config::CONFIG;
 use crate::strategy::binance::{StrategyMessage, AccountMessage};
 
 pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage>) {
-    info!("starting ud stream");
     let key = get_key().await;
     let url = format!("{}/ws/{}", CONFIG.binance_perpetuals_url.clone(), key);
+    info!("url {}", url);
     let (ws_stream, res) = connect_async(url)
         .await
         .expect("error building stream");
-    info!("ud res: {:?}", res);
-    if res.status().is_informational() { panic!("information status in ud, stream: {:?}\nres: {:?}", ws_stream, res); }
-    else if !res.status().is_success() { panic!("panic stream: {:?}\nres: {:?}", ws_stream, res); }
+    if !(res.status().is_informational() || res.status().is_success()) { panic!("panic stream: {:?}\nres: {:?}", ws_stream, res); }
 
     let (mut write, mut read) = ws_stream.split();
 
