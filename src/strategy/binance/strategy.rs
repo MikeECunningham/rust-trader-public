@@ -39,7 +39,7 @@ pub const SCALE_RISK: usize = 0;
 pub const SCALE: i32 = 2;
 pub const RATE_CAP: i32 = 10;
 
-pub const CHIRP: bool = false;
+pub const CHIRP: bool = true;
 pub const CHIRP_ON_FLIP: bool = true;
 pub const CHIRP_INCLUDES_DATA: bool = true;
 
