@@ -2,6 +2,12 @@
 * THIS FILE HAS HAD CONTENT REDACTED
 */
 
+/**
+ * With models generally being big, heavy list/map structures that can't implement Copy,
+ * or otherwise be quickly sent across threads, it's best to process their data into
+ * lightweight payloads here.
+ */
+
 use std::time::Instant;
 use crate::orderbook::{OrderBook, OrderBookValue, Tops};
 use crate::tradeflow::TradeFlow;
