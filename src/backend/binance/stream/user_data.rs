@@ -16,12 +16,13 @@ use crate::config::CONFIG;
 use crate::strategy::binance::{StrategyMessage, AccountMessage};
 
 pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage>) {
-
+    info!("starting ud stream");
     let key = get_key().await;
     let url = format!("{}/ws/{}", CONFIG.binance_perpetuals_url.clone(), key);
     let (ws_stream, res) = connect_async(url)
         .await
         .expect("error building stream");
+    info!("ud res: {:?}", res);
     if !(res.status().is_informational() || res.status().is_success()) { panic!("panic stream: {:?}\nres: {:?}", ws_stream, res); }
 
     let (mut write, mut read) = ws_stream.split();
@@ -56,6 +57,7 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
                     Err(err) => panic!("Something went wrong getting next message: {}", err),
                 };
                 // .expect("something went wrong getting next message");
+            info!("msg loop ud: {}", msg);
             if msg_send.send(WebsocketMessager::Message(msg)).await.is_err() {
                 panic!("something went wrong sending private msg to main ws thread");
             }
@@ -68,7 +70,7 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
                 match m {
 
                     Message::Text(txt) => {
-                        info!("ud stream {}", txt);
+                        info!("ud stream txt {}", txt);
                         if txt.contains("ORDER_TRADE_UPDATE") {
                             let ud = serde_json::from_str::<UserStreamWrapper<OrderUpdateData>>(&txt.to_string()).expect("Deser UD went wrong");
                             sender.send(StrategyMessage::AccountMessage(AccountMessage::OrderUpdate(ud.data))).expect("err sending od out of ws");
