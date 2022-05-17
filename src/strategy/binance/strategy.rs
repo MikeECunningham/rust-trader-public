@@ -41,7 +41,7 @@ pub const RATE_CAP: i32 = 10;
 
 pub const CHIRP: bool = true;
 pub const CHIRP_ON_FLIP: bool = true;
-pub const CHIRP_INCLUDES_DATA: bool = true;
+pub const CHIRP_INCLUDES_DATA: bool = false;
 
 lazy_static! {
     pub static ref REBATE: D128 = D128::from(0.0001);
