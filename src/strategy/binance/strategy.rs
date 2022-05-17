@@ -233,8 +233,7 @@ impl Strategy {
             StratBranch::SNS => {
                 while self.asset_portfolio.new_limit(
                     None,
-                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell)
-                        .neutral_cb(rebate, side),
+                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).neutral_cb(rebate, side),
                     side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_liqs.total_outstanding.inv,
                     side,
                     Stage::Entry,
@@ -244,8 +243,7 @@ impl Strategy {
             StratBranch::SSS => {
                 while self.asset_portfolio.new_limit(
                     None,
-                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell)
-                        .neutral_cb(rebate, side),
+                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).neutral_cb(rebate, side),
                     side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_liqs.total_outstanding.inv,
                     side,
                     Stage::Entry,
@@ -282,7 +280,7 @@ impl Strategy {
     }
 
     pub fn order_update(&mut self, oud: OrderUpdateData) {
-        // info!("{:?}", oud);
+        info!("{:?}", oud);
         self.asset_portfolio.order_update(oud);
     }
 
