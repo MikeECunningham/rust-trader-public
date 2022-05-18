@@ -76,15 +76,15 @@ impl Portfolio {
             .enable_io()
             .enable_time()
             .build()?;
-        let max = D128::from(12);
+        let max = D128::from(8);
         let mut app = Portfolio {
-            buy: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Buy, D128::from(1.3), max / D128::from(2)),
-            sell: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Sell, D128::from(1.3), max / D128::from(2)),
+            buy: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Buy, D128::from(1), max / D128::from(2)),
+            sell: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Sell, D128::from(1), max / D128::from(2)),
             historical: vec![],
             init_size: D128::from(0.001),
             max_open_orders: max,
             rebase_distance_limit: D128::from(10),
-            max_size: D128::from(1.3),
+            max_size: D128::from(1),
             symbol: symbol,
             strat_tx,
             pool,
@@ -122,7 +122,7 @@ impl Portfolio {
     ) -> bool {
         // self.data_refresh();
         if stage == Stage::Entry && (size > self.data.remaining_margin || D128::ONE > self.data.remaining_count) {
-            // debug!("portrej {} rem: {}, count: {}", side, self.data.remaining_margin, self.data.remaining_count);
+            debug!("portrej {} rem: {}, count: {}", side, self.data.remaining_margin, self.data.remaining_count);
             return false;
         }
         if size.is_nan() { panic!("size is nan"); }
