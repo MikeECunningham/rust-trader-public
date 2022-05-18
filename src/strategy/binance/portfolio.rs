@@ -91,7 +91,7 @@ impl Portfolio {
             init_size: D128::from(0.001),
             max_open_orders: max,
             rebase_distance_limit: D128::from(10),
-            max_size: D128::from(1),
+            max_size: D128::from(0.6),
             symbol: symbol,
             strat_tx,
             pool,
