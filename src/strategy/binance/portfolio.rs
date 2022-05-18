@@ -76,7 +76,7 @@ impl Portfolio {
             .enable_io()
             .enable_time()
             .build()?;
-        let max = D128::from(8);
+        let max = D128::from(12);
         let mut app = Portfolio {
             buy: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Buy, D128::from(1.3), max / D128::from(2)),
             sell: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Sell, D128::from(1.3), max / D128::from(2)),
