@@ -277,7 +277,7 @@ impl Strategy {
     }
 
     pub fn position_update(&mut self, pud: PositionUpdateData) {
-        // info!("{:?}", pud);
+        info!("{:?}", pud);
     }
 
     pub fn order_update(&mut self, oud: OrderUpdateData) {
