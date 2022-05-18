@@ -18,7 +18,6 @@ use crate::strategy::binance::{StrategyMessage, AccountMessage};
 pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage>) {
     let key = get_key().await;
     let url = format!("{}/ws/{}", CONFIG.binance_perpetuals_url.clone(), key);
-    info!("url {}", url);
     let (ws_stream, res) = connect_async(url)
         .await
         .expect("error building stream");
@@ -58,7 +57,6 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
                     Err(err) => panic!("Something went wrong getting next message: {}", err),
                 };
                 // .expect("something went wrong getting next message");
-            info!("msg loop ud: {}", msg);
             if msg_send.send(WebsocketMessager::Message(msg)).await.is_err() {
                 panic!("something went wrong sending private msg to main ws thread");
             }
@@ -71,7 +69,6 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
                 match m {
 
                     Message::Text(txt) => {
-                        info!("ud stream txt {}", txt);
                         if txt.contains("ORDER_TRADE_UPDATE") {
                             let ud = serde_json::from_str::<UserStreamWrapper<OrderUpdateData>>(&txt.to_string()).expect("Deser UD went wrong");
                             sender.send(StrategyMessage::AccountMessage(AccountMessage::OrderUpdate(ud.data))).expect("err sending od out of ws");
@@ -136,7 +133,6 @@ async fn get_key() -> String {
         .text()
         .await
         .expect("error getting key response text");
-    info!("ud key: {}", key);
     serde_json::from_str::<Key>(&key).expect("error deserializing listen key res").listen_key
 }
 
