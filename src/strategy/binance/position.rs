@@ -171,9 +171,10 @@ impl Position {
 
         for (_, order)
         in stage.aggress_mut(&mut self.opens, &mut self.closes)
-        .order_map.iter_mut() {
+        .order_map.iter_mut()
+        .filter(|(_, ord)| ord.order_class == OrderClassification::Top) {
             if found_top == FindCancelRes::NotFound { found_top = FindCancelRes::Found }
-            if order.order_class == OrderClassification::Top && order.can_cancel() {
+            if order.can_cancel() {
                 if *self.side.deside(
                     stage.aggress(&(order.orig_price < best), &(order.orig_price > best)),
                     stage.aggress(&(order.orig_price > best), &(order.orig_price < best))
