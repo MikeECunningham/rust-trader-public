@@ -265,7 +265,7 @@ impl Position {
             close_liqs: close_liqs,
             open_position: FinData::from(open_liqs.filled - close_liqs.filled),
             total_count: open_liqs.total_count + close_liqs.total_count,
-            remaining_count: self.pos_max_orders - open_liqs.total_count,
+            remaining_count: self.pos_max_orders - open_liqs.total_reserved.count,
             remaining_margin: self.pos_max_size - open_liqs.total_outstanding.inv,
             // active_delta: todo!(),
             // total_delta: todo!(),

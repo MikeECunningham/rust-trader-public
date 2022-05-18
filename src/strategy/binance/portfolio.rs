@@ -133,6 +133,7 @@ impl Portfolio {
             return false;
         }
         if size.is_nan() { panic!("size is nan"); }
+        else if size.is_zero() { panic!("size is zero, dump: {}\n{:?}\n{:?}", self.data, self.buy, self.sell); }
         // info!("{:?} {:?} order up for {}", side, stage, size);
         match side {
             Side::Buy => {
