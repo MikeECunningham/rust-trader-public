@@ -171,16 +171,17 @@ impl Position {
 
         for (_, order)
         in stage.aggress_mut(&mut self.opens, &mut self.closes)
-        .order_map.iter_mut()
-        .filter(|(_, ord)| ord.order_class == OrderClassification::Top && ord.can_cancel()) {
+        .order_map.iter_mut() {
             if found_top == FindCancelRes::NotFound { found_top = FindCancelRes::Found }
-            if *self.side.deside(
-                stage.aggress(&(order.orig_price < best), &(order.orig_price > best)),
-                stage.aggress(&(order.orig_price > best), &(order.orig_price < best))
-            ) {
-                found_top = FindCancelRes::Cancelled;
-                // info!("Cancelling a non-top {:?} at {}, best is {}", stage, order.price, best);
-                Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+            if order.order_class == OrderClassification::Top && order.can_cancel() {
+                if *self.side.deside(
+                    stage.aggress(&(order.orig_price < best), &(order.orig_price > best)),
+                    stage.aggress(&(order.orig_price > best), &(order.orig_price < best))
+                ) {
+                    found_top = FindCancelRes::Cancelled;
+                    // info!("Cancelling a non-top {:?} at {}, best is {}", stage, order.price, best);
+                    Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+                }
             }
         }
         found_top
