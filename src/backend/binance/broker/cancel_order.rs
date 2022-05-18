@@ -16,7 +16,7 @@ impl Broker {
             receive_window: 5000,
             timestamp: self.calculate_server_time().expect("Failed to calculate server time"),
         }.get_signed_data(self.auth.secret.clone()).expect("Sign error");
-        info!("can req: {}", req);
+        // info!("can req: {}", req);
         let timer = Instant::now();
         let cancel_res = self.client
             .delete(format!("{}/fapi/v1/order?{}", self.auth.url, req))

@@ -203,11 +203,11 @@ impl Position {
             Some(b) => {
                 found_rebases = FindCancelRes::Found;
                 if (b - top).abs() > limit {
-                    for (_, order) in stage.aggress_mut(&mut self.opens, &mut self.closes).order_map.iter_mut()
-                    .filter(|(_, ord)| ord.order_class == OrderClassification::Rebase && ord.can_cancel()) {
-                        found_rebases = FindCancelRes::Cancelled;
-
-                        Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+                    for (_, order) in stage.aggress_mut(&mut self.opens, &mut self.closes).order_map.iter_mut() {
+                        if order.order_class == OrderClassification::Rebase && order.can_cancel() {
+                            found_rebases = FindCancelRes::Cancelled;
+                            Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+                        }
                     }
                 }
                 found_rebases
