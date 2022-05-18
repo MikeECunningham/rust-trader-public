@@ -41,7 +41,7 @@ pub const RATE_CAP: i32 = 10;
 
 pub const CHIRP: bool = true;
 pub const CHIRP_ON_FLIP: bool = true;
-pub const CHIRP_INCLUDES_DATA: bool = false;
+pub const CHIRP_INCLUDES_DATA: bool = true;
 
 lazy_static! {
     pub static ref REBATE: D128 = D128::from(0.0001);
@@ -142,6 +142,7 @@ impl Strategy {
                     FindCancelRes::Found => {},
                     FindCancelRes::Cancelled => {},
                     FindCancelRes::NotFound => {
+                        // Just because there are opens does not mean they are Top classified, so let's add one that is
                         self.asset_portfolio.new_limit(
                             None,
                             entry_price,
@@ -280,7 +281,7 @@ impl Strategy {
     }
 
     pub fn order_update(&mut self, oud: OrderUpdateData) {
-        info!("UPDATE {:?}", oud);
+        // info!("UPDATE {:?}", oud);
         self.asset_portfolio.order_update(oud);
     }
 
