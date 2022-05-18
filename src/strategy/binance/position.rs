@@ -327,7 +327,7 @@ impl Position {
         rem_count: D128,
     ) -> bool {
         if stage == Stage::Entry && (size > rem_margin || D128::ONE > rem_count) {
-            // debug!("posrej {} rem: {}, count: {}", self.side, rem_margin, rem_count);
+            debug!("posrej {} rem: {}, count: {}", self.side, rem_margin, rem_count);
             return false;
         }
         let ord = Order::new_rebate(id, price, size, class);

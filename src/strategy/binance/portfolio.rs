@@ -122,7 +122,7 @@ impl Portfolio {
     ) -> bool {
         // self.data_refresh();
         if stage == Stage::Entry && (size > self.data.remaining_margin || D128::ONE > self.data.remaining_count) {
-            debug!("portrej {} rem: {}, count: {}", side, self.data.remaining_margin, self.data.remaining_count);
+            // debug!("portrej {} rem: {}, count: {}", side, self.data.remaining_margin, self.data.remaining_count);
             return false;
         }
         if size.is_nan() { panic!("size is nan"); }
