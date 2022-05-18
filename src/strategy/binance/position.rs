@@ -326,7 +326,7 @@ impl Position {
         rem_margin: D128,
         rem_count: D128,
     ) -> bool {
-        if stage == Stage::Entry && (size > rem_margin || D128::ONE > rem_count) {
+        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > rem_margin || D128::ONE > rem_count) {
             debug!("posrej {} rem: {}, count: {}", self.side, rem_margin, rem_count);
             return false;
         }
@@ -363,7 +363,7 @@ impl Position {
         rem_margin: D128,
         rem_count: D128,
     ) -> bool {
-        if stage == Stage::Entry && (size > rem_margin || D128::ONE >= rem_count) { return false; }
+        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > rem_margin || D128::ONE >= rem_count) { return false; }
         let ord = Order::new_taker(id, expected_price, size, class);
         match stage {
             Stage::Entry => {

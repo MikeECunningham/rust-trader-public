@@ -15,6 +15,13 @@ use super::order_list::OrderData;
 use super::{StrategyMessage, Position, PositionData, FinData, FindCancelRes, Order, OrderResponseContext};
 
 #[derive(Clone, Copy)]
+pub struct Limits {
+    pub tops: D128,
+    pub rebases: D128,
+    pub liquidity: D128,
+}
+
+#[derive(Clone, Copy)]
 pub struct PortfolioData {
     pub buy: PositionData,
     pub sell: PositionData,
@@ -121,7 +128,7 @@ impl Portfolio {
         class: OrderClassification,
     ) -> bool {
         // self.data_refresh();
-        if stage == Stage::Entry && (size > self.data.remaining_margin || D128::ONE > self.data.remaining_count) {
+        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > self.data.remaining_margin || D128::ONE > self.data.remaining_count) {
             // debug!("portrej {} rem: {}, count: {}", side, self.data.remaining_margin, self.data.remaining_count);
             return false;
         }
@@ -151,7 +158,7 @@ impl Portfolio {
         class: OrderClassification,
     ) -> bool {
         // self.data_refresh();
-        if stage == Stage::Entry && (size > self.data.remaining_margin || D128::ONE > self.data.remaining_count) { info!("failed portfolio\n{}", self.data); return false; }
+        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > self.data.remaining_margin || D128::ONE > self.data.remaining_count) { info!("failed portfolio\n{}", self.data); return false; }
         if size.is_nan() { panic!("size is nan, dump: {}\n{:?}\n{:?}", self.data, self.buy, self.sell); }
         else if size.is_zero() { panic!("size is zero, dump: {}\n{:?}\n{:?}", self.data, self.buy, self.sell); }
         match side {
