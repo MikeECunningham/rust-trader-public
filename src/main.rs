@@ -72,6 +72,7 @@ fn automated_entrypoint_binance() {
         // Create a new signal handler, passing in channels for receiving events and updating the strategy
         let mut sig_handler = binance_handler::SignalHandler::new(strat_tx.clone(), signal_rx);
         {
+            let stratshot = strat_tx.clone();
             let signal_tx = signal_tx.clone();
             let symbol = symbol.clone();
             info!("[INIT] Querying server time");
@@ -80,21 +81,7 @@ fn automated_entrypoint_binance() {
                 let our_time: i64 = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis().try_into().unwrap();
                 binance::broker::BROKER.set_server_offset(server_time - our_time).unwrap();
                 info!("[INIT] Queried server time");
-            });
-        }
-        {
-            let signal_tx = signal_tx.clone();
-            let symbol = symbol.clone();
-            info!("[INIT] Spawning orderbook stream");
-            pool.spawn(async move { binance::stream::orderbook::connect_orderbook(signal_tx, symbol).await; });
-            info!("[INIT] Spawned orderbook stream");
-        }
-        {
-            let stratshot = strat_tx.clone();
-            let signal_tx = signal_tx.clone();
-            let symbol = symbol.clone();
-            info!("[INIT] Snapshots");
-            pool.spawn(async move {
+                info!("[INIT] Snapshots");
                 let snap = binance::market::MARKET.orderbook_snapshot(symbol, DepthLimit::Thousand).await;
                 signal_tx.send(Signal::OrderBook(OrderBookSignal::OrderBookSnap(snap))).await.expect("ob snap main");
                 loop {
@@ -107,6 +94,13 @@ fn automated_entrypoint_binance() {
                     }
                 }
             });
+        }
+        {
+            let signal_tx = signal_tx.clone();
+            let symbol = symbol.clone();
+            info!("[INIT] Spawning orderbook stream");
+            pool.spawn(async move { binance::stream::orderbook::connect_orderbook(signal_tx, symbol).await; });
+            info!("[INIT] Spawned orderbook stream");
         }
         {
             let signal_tx = signal_tx.clone();
