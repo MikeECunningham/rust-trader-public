@@ -61,8 +61,8 @@ pub struct TradeFlowValue {
 impl TradeFlowValue {
     pub fn new() -> TradeFlowValue {
         return TradeFlowValue {
-            price: D128::from(0),
-            quantity: D128::from(0),
+            price: D128::ZERO,
+            quantity: D128::ZERO,
             timestamp: 0,
         };
     }
@@ -164,7 +164,7 @@ impl TradeFlow {
         info!(
             "[INIT] buy liq from csv 3rd dev {}",
             tradeflow.buy_metrics.forever_liquidity.mean
-                + tradeflow.buy_metrics.forever_liquidity.stan_dev * D128::from(3)
+                + tradeflow.buy_metrics.forever_liquidity.stan_dev * 3
         );
 
         tradeflow

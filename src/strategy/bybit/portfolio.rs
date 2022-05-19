@@ -70,8 +70,8 @@ impl Portfolio {
             .build()?;
         let max = D128::from(8);
         let mut app = Portfolio {
-            buy: Position::new(pool.handle().clone(), symbol.clone(), Side::Buy, D128::from(1.3), max / D128::from(2)),
-            sell: Position::new(pool.handle().clone(), symbol.clone(), Side::Sell, D128::from(1.3), max / D128::from(2)),
+            buy: Position::new(pool.handle().clone(), symbol.clone(), Side::Buy, D128::from(1.3), max / 2),
+            sell: Position::new(pool.handle().clone(), symbol.clone(), Side::Sell, D128::from(1.3), max / 2),
             historical: vec![],
             init_size: D128::from(0.001),
             max_open_orders: max,

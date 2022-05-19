@@ -87,8 +87,8 @@ impl Portfolio {
             .build()?;
         let max = D128::from(8);
         let mut app = Portfolio {
-            buy: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Buy, D128::from(1), max / D128::from(2)),
-            sell: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Sell, D128::from(1), max / D128::from(2)),
+            buy: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Buy, D128::ZERO, max / 2),
+            sell: Position::new(pool.handle().clone(), strat_tx.clone(), symbol.clone(), Side::Sell, D128::ZERO, max / 2),
             historical: vec![],
             init_size: D128::from(0.001),
             max_open_orders: max,
@@ -237,7 +237,7 @@ impl Portfolio {
     pub fn balance_update(&mut self, balance: &PositionUpdateBalance) {
         self.balance += balance.balance_change;
         self.available_balance = balance.wallet_balance;
-        self.max_size = self.available_balance * D128::from(0.8);
+        self.max_size = self.available_balance * 0.8;
         self.buy.balance_update(balance.wallet_balance);
         self.sell.balance_update(balance.wallet_balance);
         self.data_refresh();
@@ -246,7 +246,7 @@ impl Portfolio {
     pub fn balance_refresh(&mut self, balance: AccountBalance) {
         self.balance = balance.balance;
         self.available_balance = balance.available_balance;
-        self.max_size = balance.balance * D128::from(0.8);
+        self.max_size = balance.balance * 0.8;
         self.buy.balance_refresh(balance.balance);
         self.sell.balance_refresh(balance.balance);
         self.data_refresh();

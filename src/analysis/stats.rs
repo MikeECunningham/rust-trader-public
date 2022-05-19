@@ -63,10 +63,10 @@ impl RegularStats {
                 - (self.sum_independent * self.sum_independent)); // (n * sum(xy) - (sum(x) * sum(y))) / (n * sum(x^2) - sum(x)^2)
     }
     pub fn add(&mut self, key: u64, value: D128) {
-        let independent = D128::from(key);
+        let independent = key;
         self.last = self.current;
         self.current = value;
-        self.length += D128::from(1);
+        self.length += 1;
         self.history.push_back((key, value));
         self.sum_dependent += value;
         self.squared_sum_dependent += value * value;
@@ -82,8 +82,8 @@ impl RegularStats {
             .history
             .partition_point(|(timestamp, _)| timestamp < &lt);
         for (timestamp, value) in self.history.drain(..drain_end) {
-            let independent = D128::from(timestamp);
-            self.length -= D128::from(1);
+            let independent = timestamp;
+            self.length -= 1;
             self.sum_dependent -= value;
             self.squared_sum_dependent -= value * value;
             self.sum_independent -= independent;
@@ -124,7 +124,7 @@ impl NormalStats {
             slope: D128::ZERO,
             last: D128::ZERO,
             highest: D128::ZERO,
-            lowest: D128::from(1) / D128::ZERO,
+            lowest: 1 / D128::ZERO,
             log_mean: D128::ZERO,
             log_var: D128::ZERO,
             log_stdv: D128::ZERO,
