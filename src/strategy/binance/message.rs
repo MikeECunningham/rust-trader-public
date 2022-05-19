@@ -1,4 +1,4 @@
-use crate::{backend::binance::types::{PositionUpdateData, OrderUpdateData, OrderResponse}, analysis::{BookResult, TradeResult}, orderbook::Tops};
+use crate::{backend::{binance::types::{PositionUpdateData, OrderUpdateData, OrderResponse, AccountBalance}, bybit::broker::Balance}, analysis::{BookResult, TradeResult}, orderbook::Tops};
 
 use super::{OrderResponseContext, CancelResponseContext};
 
@@ -8,7 +8,7 @@ pub enum AccountMessage {
     OrderUpdate(OrderUpdateData),
     OrderResponse(OrderResponseContext),
     CancelResponse(CancelResponseContext),
-
+    BalanceRefresh(Vec<AccountBalance>),
 }
 
 #[derive(Clone, Debug)]

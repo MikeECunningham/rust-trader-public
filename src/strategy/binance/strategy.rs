@@ -13,6 +13,7 @@ use std::time::Instant;
 use crate::analysis::BookResult;
 use crate::analysis::TradeResult;
 use crate::backend::binance::broker::BROKER;
+use crate::backend::binance::types::AccountBalance;
 use crate::backend::binance::types::OrderResponse;
 use crate::backend::binance::types::OrderResponseWrapper;
 use crate::backend::binance::types::OrderUpdateData;
@@ -99,6 +100,7 @@ impl Strategy {
                     AccountMessage::OrderUpdate(oud) => self.order_update(oud),
                     AccountMessage::OrderResponse(or) => self.order_response(or),
                     AccountMessage::CancelResponse(cr) => self.cancel_response(cr),
+                    AccountMessage::BalanceRefresh(br) => self.balance_refresh(br),
                 },
             }
         }
@@ -277,7 +279,13 @@ impl Strategy {
     }
 
     pub fn position_update(&mut self, pud: PositionUpdateData) {
-        info!("{:?}", pud);
+        // info!("{:?}", pud);
+        for balance in pud.balances.iter() {
+            if balance.asset == "BUSD" {
+                self.asset_portfolio.balance_update(balance);
+                break;
+            }
+        }
     }
 
     pub fn order_update(&mut self, oud: OrderUpdateData) {
@@ -293,6 +301,16 @@ impl Strategy {
     pub fn cancel_response(&mut self, cr: CancelResponseContext) {
         // info!("{:?}", cr);
         self.asset_portfolio.cancel_response(cr.id, cr.side, cr.stage, cr.rest_response);
+    }
+
+    pub fn balance_refresh(&mut self, balances: Vec<AccountBalance>) {
+        info!("{:?}", balances);
+        for balance in balances {
+            if balance.asset == "BUSD" {
+                self.asset_portfolio.balance_refresh(balance);
+                break;
+            }
+        }
     }
 
     /// Quick and dirty debug outputs

@@ -7,7 +7,7 @@ use dec::D128;
 use tokio::runtime::{Runtime, Builder};
 use uuid::Uuid;
 
-use crate::backend::binance::types::{PositionUpdateData, PositionUpdate, BinanceSide, OrderUpdateData, OrderResponseWrapper, CancelResponseWrapper};
+use crate::backend::binance::types::{PositionUpdateData, BinanceSide, OrderUpdateData, OrderResponseWrapper, CancelResponseWrapper, AccountBalance, PositionUpdatePosition, PositionUpdateBalance};
 use crate::backend::types::Side;
 use crate::strategy::types::{Stage, OrderClassification};
 
@@ -68,6 +68,8 @@ pub struct Portfolio {
     pub max_open_orders: D128,
     ///
     pub max_size: D128,
+    pub balance: D128,
+    pub available_balance: D128,
     ///
     pub rebase_distance_limit: D128,
     /// Channel for sending updates back to the main strategy
@@ -91,7 +93,9 @@ impl Portfolio {
             init_size: D128::from(0.001),
             max_open_orders: max,
             rebase_distance_limit: D128::from(10),
-            max_size: D128::from(0.6),
+            max_size: D128::ZERO,
+            balance: D128::ZERO,
+            available_balance: D128::ZERO,
             symbol: symbol,
             strat_tx,
             pool,
@@ -121,14 +125,15 @@ impl Portfolio {
 
     pub fn new_limit(
         &mut self,
-        id: Option<Uuid>, price: D128,
+        id: Option<Uuid>,
+        price: D128,
         size: D128,
         side: Side,
         stage: Stage,
         class: OrderClassification,
     ) -> bool {
         // self.data_refresh();
-        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > self.data.remaining_margin || D128::ONE > self.data.remaining_count) {
+        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > (self.data.remaining_margin / price) || D128::ONE > self.data.remaining_count) {
             // debug!("portrej {} rem: {}, count: {}", side, self.data.remaining_margin, self.data.remaining_count);
             return false;
         }
@@ -137,12 +142,12 @@ impl Portfolio {
         // info!("{:?} {:?} order up for {}", side, stage, size);
         match side {
             Side::Buy => {
-                let r = self.buy.new_limit(id, price, size, stage, class, self.data.buy.remaining_margin, self.data.buy.remaining_count);
+                let r = self.buy.new_limit(id, price, size, stage, class, self.data.buy.remaining_margin / price, self.data.buy.remaining_count);
                 self.data_refresh();
                 r
             },
             Side::Sell => {
-                let r = self.sell.new_limit(id, price, size, stage, class, self.data.sell.remaining_margin, self.data.sell.remaining_count);
+                let r = self.sell.new_limit(id, price, size, stage, class, self.data.sell.remaining_margin / price, self.data.sell.remaining_count);
                 self.data_refresh();
                 r
             },
@@ -159,17 +164,17 @@ impl Portfolio {
         class: OrderClassification,
     ) -> bool {
         // self.data_refresh();
-        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > self.data.remaining_margin || D128::ONE > self.data.remaining_count) { info!("failed portfolio\n{}", self.data); return false; }
+        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > (self.data.remaining_margin / expected_price) || D128::ONE > self.data.remaining_count) { info!("failed portfolio\n{}", self.data); return false; }
         if size.is_nan() { panic!("size is nan, dump: {}\n{:?}\n{:?}", self.data, self.buy, self.sell); }
         else if size.is_zero() { panic!("size is zero, dump: {}\n{:?}\n{:?}", self.data, self.buy, self.sell); }
         match side {
             Side::Buy => {
-                let r = self.buy.new_market(id, expected_price, size, stage, class, self.data.buy.remaining_margin, self.data.buy.remaining_count);
+                let r = self.buy.new_market(id, expected_price, size, stage, class, self.data.buy.remaining_margin / expected_price, self.data.buy.remaining_count);
                 self.data_refresh();
                 r
             },
             Side::Sell => {
-                let r = self.sell.new_market(id, expected_price, size, stage, class, self.data.sell.remaining_margin, self.data.sell.remaining_count);
+                let r = self.sell.new_market(id, expected_price, size, stage, class, self.data.sell.remaining_margin / expected_price, self.data.sell.remaining_count);
                 self.data_refresh();
                 r
             },
@@ -211,21 +216,37 @@ impl Portfolio {
         self.data_refresh();
     }
 
-    pub fn position_update(&mut self, update: PositionUpdate) {
-        match update.position.side {
-            BinanceSide::Buy => self.buy.position_update(update.position),
-            BinanceSide::Sell => self.sell.position_update(update.position),
-            BinanceSide::Both => todo!(),
-        }
-        self.data_refresh();
-    }
-
     pub fn order_update(&mut self, order: OrderUpdateData) {
         match order.position_side {
                 BinanceSide::Buy => self.buy.order_update(order),
                 BinanceSide::Sell => self.sell.order_update(order),
                 BinanceSide::Both => todo!(),
             };
+        self.data_refresh();
+    }
+
+    pub fn position_update(&mut self, position: PositionUpdatePosition) {
+        match position.side {
+            BinanceSide::Buy => self.buy.position_update(position),
+            BinanceSide::Sell => self.sell.position_update(position),
+            BinanceSide::Both => todo!(),
+        }
+        self.data_refresh();
+    }
+
+    pub fn balance_update(&mut self, balance: &PositionUpdateBalance) {
+        self.balance += balance.balance_change;
+        self.available_balance = balance.wallet_balance;
+        self.max_size = self.available_balance * D128::from(0.8);
+        self.buy.balance_update(balance.wallet_balance);
+        self.sell.balance_update(balance.wallet_balance);
+        self.data_refresh();
+    }
+
+    pub fn balance_refresh(&mut self, balance: AccountBalance) {
+        self.balance = balance.balance;
+        self.available_balance = balance.available_balance;
+        self.max_size = balance.balance * D128::from(0.8);
         self.data_refresh();
     }
 

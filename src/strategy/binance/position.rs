@@ -317,6 +317,10 @@ impl Position {
         self.known_prebate_pnl = position.accumulated_realized;
     }
 
+    pub fn balance_update(&mut self, balance: D128) {
+        self.pos_max_size = balance * D128::from(0.8) / D128::from(2);
+    }
+
     pub fn new_limit(
         &mut self,
         id: Option<Uuid>, price: D128,

@@ -13,7 +13,7 @@ use std::{thread, time::{UNIX_EPOCH, SystemTime}};
 use tokio::{runtime::{Builder, Runtime}, time::Instant};
 use crossbeam_channel::{Sender, Receiver, unbounded};
 
-use trader::{backend::{bybit, types::Side}, strategy::types::Stage};
+use trader::{backend::{bybit, types::Side, binance::{types::{AccountBalanceWrapper, BinanceError}, errors::{ErrorCode, ServerNetworkErrors}}}, strategy::{types::Stage, binance::{StrategyMessage, AccountMessage}}};
 use trader::strategy;
 use trader::signal_handler::{bybit_handler, binance_handler};
 use trader::backend::binance;
@@ -82,7 +82,6 @@ fn automated_entrypoint_binance() {
                 info!("[INIT] Queried server time");
             });
         }
-
         {
             let signal_tx = signal_tx.clone();
             let symbol = symbol.clone();
@@ -91,12 +90,22 @@ fn automated_entrypoint_binance() {
             info!("[INIT] Spawned orderbook stream");
         }
         {
+            let stratshot = strat_tx.clone();
             let signal_tx = signal_tx.clone();
             let symbol = symbol.clone();
-            info!("[INIT] Orderbook Snapshot");
+            info!("[INIT] Snapshots");
             pool.spawn(async move {
                 let snap = binance::market::MARKET.orderbook_snapshot(symbol, DepthLimit::Thousand).await;
                 signal_tx.send(Signal::OrderBook(OrderBookSignal::OrderBookSnap(snap))).await.expect("ob snap main");
+                loop {
+                    match binance::broker::BROKER.account_balance().await {
+                        AccountBalanceWrapper::Balance(bal) => {
+                            stratshot.send(StrategyMessage::AccountMessage(AccountMessage::BalanceRefresh(bal))).unwrap();
+                            break;
+                        },
+                        AccountBalanceWrapper::Error(_) => {},
+                    }
+                }
             });
         }
         {
@@ -126,7 +135,6 @@ fn automated_entrypoint_binance() {
             // Start the event loop
             sig_handler.event_loop();
         });
-
         {
             let strat_tx = strat_tx.clone();
             let symbol = symbol.clone();
