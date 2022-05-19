@@ -247,6 +247,8 @@ impl Portfolio {
         self.balance = balance.balance;
         self.available_balance = balance.available_balance;
         self.max_size = balance.balance * D128::from(0.8);
+        self.buy.balance_refresh(balance.balance);
+        self.sell.balance_refresh(balance.balance);
         self.data_refresh();
     }
 
