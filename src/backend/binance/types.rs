@@ -342,12 +342,6 @@ pub struct PositionUpdateBalance {
     pub balance_change: D128
 }
 
-#[derive(Deserialize, Clone, Debug)]
-pub struct PositionUpdate {
-    pub balance: PositionUpdateBalance,
-    pub position: PositionUpdatePosition,
-}
-
 #[derive(Serialize, BinanceSignable, Debug)]
 pub struct MarketOrderRequest {
     pub symbol: String,
@@ -508,6 +502,27 @@ pub struct CancelResponse {
     pub price_protect: Option<bool>,
 }
 
+#[derive(Serialize, BinanceSignable, Debug)]
+pub struct AccountBalanceRequest {
+    #[serde(rename = "recvWindow")]
+    pub receive_window: u64,
+    pub timestamp: u64,
+}
+
+#[derive(Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct AccountBalance {
+    pub account_alias: String,
+    pub asset: String,
+    pub balance: D128,
+    pub cross_wallet_balance: D128,
+    pub cross_un_pnl: D128,
+    pub available_balance: D128,
+    pub max_withdraw_amount: D128,
+    pub margin_available: bool,
+    pub update_time: i64,
+}
+
 #[derive(Serialize, Debug)]
 pub struct WebsocketSubscribe {
     pub method: String,
@@ -552,8 +567,6 @@ pub struct ServerTimeResponse {
 
 
 /// TYPE ENUMS
-
-
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy)]
 pub enum BinanceTimeInForce {
@@ -758,6 +771,14 @@ pub enum WorkingType {
 
 
 /// ROUTING ENUMS
+
+
+#[derive(Deserialize, Debug, Clone,)]
+#[serde(untagged)]
+pub enum AccountBalanceWrapper {
+    Balance(Vec<AccountBalance>),
+    Error(BinanceError)
+}
 
 
 #[derive(Deserialize, Clone, Debug)]

@@ -9,11 +9,9 @@ use crate::backend::bybit::broker::BROKER;
 use crate::backend::bybit::broker::SetServerOffsetError;
 use crate::backend::bybit::broker::Side;
 use crate::backend::bybit::errors::PerpetualStatus;
-use crate::backend::bybit::rate_limits::EndpointLimits;
 use crate::backend::bybit::stream::BybitExecutionData;
 use crate::backend::bybit::stream::BybitOrderData;
 use crate::backend::bybit::stream::BybitPositionData;
-use crate::backend::bybit::rate_limits::IPLimits;
 use crate::strategy::types::OrderClassification;
 use crate::strategy::types::Stage;
 
@@ -60,8 +58,6 @@ pub struct Strategy {
     pub max_risked_liq: D128,
     last_buy_branch: StratBranch,
     last_sell_branch: StratBranch,
-    ip_limits: IPLimits,
-    endpoint_limits: EndpointLimits,
 }
 
 
@@ -82,8 +78,6 @@ impl Strategy {
             last_sell_branch: StratBranch::SSS,
             asset_portfolio: Portfolio::new(pp_strat_tx, symbol)?,
             max_risked_liq: D128::from(5000 as u32),
-            ip_limits: IPLimits::new(),
-            endpoint_limits: EndpointLimits::new(),
         })
     }
 

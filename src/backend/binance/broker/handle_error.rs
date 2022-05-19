@@ -43,7 +43,7 @@ impl Broker {
             InvalidTimestamp => {
                 match msg.contains("1000ms ahead") {
                     true => BROKER.set_server_offset(-1000).unwrap(),
-                    false => todo!(),
+                    false => BROKER.set_server_offset(1000).unwrap(),
                 }
             },
             InvalidSignature => todo!(),

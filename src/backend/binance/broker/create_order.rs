@@ -96,7 +96,7 @@ impl Broker {
             timestamp: self.calculate_server_time().expect("Failed to calculate server time"),
         }.get_signed_data(self.auth.secret.clone()).expect("Sign error");
 
-        // info!("req: {}", req);
+        // info!("ord req: {}", req);
         let timer = Instant::now();
         let order_res = self.client
             .post(format!("{}/fapi/v1/order?{}", self.auth.url, req))
@@ -109,6 +109,7 @@ impl Broker {
             .await
             .expect("err");
         // info!("order ping: {}", timer.elapsed().as_millis());
+        // info!("order res: {}", order_res);
         let wrapper = serde_json::from_str::<OrderResponseWrapper>(&order_res).expect("serde err binance market res");
         match &wrapper {
             OrderResponseWrapper::Order(_) => {},

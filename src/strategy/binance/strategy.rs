@@ -13,6 +13,7 @@ use std::time::Instant;
 use crate::analysis::BookResult;
 use crate::analysis::TradeResult;
 use crate::backend::binance::broker::BROKER;
+use crate::backend::binance::types::AccountBalance;
 use crate::backend::binance::types::OrderResponse;
 use crate::backend::binance::types::OrderResponseWrapper;
 use crate::backend::binance::types::OrderUpdateData;
@@ -41,7 +42,7 @@ pub const RATE_CAP: i32 = 10;
 
 pub const CHIRP: bool = false;
 pub const CHIRP_ON_FLIP: bool = true;
-pub const CHIRP_INCLUDES_DATA: bool = true;
+pub const CHIRP_INCLUDES_DATA: bool = false;
 
 lazy_static! {
     pub static ref REBATE: D128 = D128::from(0.0001);
@@ -99,6 +100,7 @@ impl Strategy {
                     AccountMessage::OrderUpdate(oud) => self.order_update(oud),
                     AccountMessage::OrderResponse(or) => self.order_response(or),
                     AccountMessage::CancelResponse(cr) => self.cancel_response(cr),
+                    AccountMessage::BalanceRefresh(br) => self.balance_refresh(br),
                 },
             }
         }
@@ -142,6 +144,7 @@ impl Strategy {
                     FindCancelRes::Found => {},
                     FindCancelRes::Cancelled => {},
                     FindCancelRes::NotFound => {
+                        // Just because there are opens does not mean they are Top classified, so let's add one that is
                         self.asset_portfolio.new_limit(
                             None,
                             entry_price,
@@ -233,8 +236,7 @@ impl Strategy {
             StratBranch::SNS => {
                 while self.asset_portfolio.new_limit(
                     None,
-                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell)
-                        .neutral_cb(rebate, side),
+                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).neutral_cb(rebate, side),
                     side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_liqs.total_outstanding.inv,
                     side,
                     Stage::Entry,
@@ -244,8 +246,7 @@ impl Strategy {
             StratBranch::SSS => {
                 while self.asset_portfolio.new_limit(
                     None,
-                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell)
-                        .neutral_cb(rebate, side),
+                    side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).neutral_cb(rebate, side),
                     side.deside(&self.asset_portfolio.data.buy, &self.asset_portfolio.data.sell).open_liqs.total_outstanding.inv,
                     side,
                     Stage::Entry,
@@ -279,10 +280,16 @@ impl Strategy {
 
     pub fn position_update(&mut self, pud: PositionUpdateData) {
         // info!("{:?}", pud);
+        for balance in pud.balances.iter() {
+            if balance.asset == "BUSD" {
+                self.asset_portfolio.balance_update(balance);
+                break;
+            }
+        }
     }
 
     pub fn order_update(&mut self, oud: OrderUpdateData) {
-        // info!("{:?}", oud);
+        // info!("UPDATE {:?}", oud);
         self.asset_portfolio.order_update(oud);
     }
 
@@ -294,6 +301,16 @@ impl Strategy {
     pub fn cancel_response(&mut self, cr: CancelResponseContext) {
         // info!("{:?}", cr);
         self.asset_portfolio.cancel_response(cr.id, cr.side, cr.stage, cr.rest_response);
+    }
+
+    pub fn balance_refresh(&mut self, balances: Vec<AccountBalance>) {
+        // info!("{:?}", balances);
+        for balance in balances {
+            if balance.asset == "BUSD" {
+                self.asset_portfolio.balance_refresh(balance);
+                break;
+            }
+        }
     }
 
     /// Quick and dirty debug outputs

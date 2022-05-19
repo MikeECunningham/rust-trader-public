@@ -16,7 +16,6 @@ use crate::config::CONFIG;
 use crate::strategy::binance::{StrategyMessage, AccountMessage};
 
 pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage>) {
-
     let key = get_key().await;
     let url = format!("{}/ws/{}", CONFIG.binance_perpetuals_url.clone(), key);
     let (ws_stream, res) = connect_async(url)
@@ -31,7 +30,7 @@ pub async fn connect_user_data(sender: crossbeam_channel::Sender<StrategyMessage
     let msg_send = send.clone();
 
     let rt = Runtime::new().expect("Failed to create runtime");
-    // The user data stream doesn't send its own pings, so yes, THIS pattern again.
+    // The user data stream doesn't send its own pings, so we'll need a timer of our own
     rt.spawn(async move {
         let mut interval = time::interval(Duration::from_secs(270));
         loop {
@@ -133,7 +132,7 @@ async fn get_key() -> String {
         .expect("error receiving key response")
         .text()
         .await
-        .expect("error getting ob snap response text");
+        .expect("error getting key response text");
     serde_json::from_str::<Key>(&key).expect("error deserializing listen key res").listen_key
 }
 

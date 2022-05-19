@@ -172,18 +172,32 @@ impl Position {
         for (_, order)
         in stage.aggress_mut(&mut self.opens, &mut self.closes)
         .order_map.iter_mut()
-        .filter(|(_, ord)| ord.order_class == OrderClassification::Top && ord.can_cancel()) {
+        .filter(|(_, ord)| ord.order_class == OrderClassification::Top) {
             if found_top == FindCancelRes::NotFound { found_top = FindCancelRes::Found }
-            if *self.side.deside(
-                stage.aggress(&(order.orig_price < best), &(order.orig_price > best)),
-                stage.aggress(&(order.orig_price > best), &(order.orig_price < best))
-            ) {
-                found_top = FindCancelRes::Cancelled;
-                // info!("Cancelling a non-top {:?} at {}, best is {}", stage, order.price, best);
-                Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+            if order.can_cancel() {
+                if *self.side.deside(
+                    stage.aggress(&(order.orig_price < best), &(order.orig_price > best)),
+                    stage.aggress(&(order.orig_price > best), &(order.orig_price < best))
+                ) {
+                    found_top = FindCancelRes::Cancelled;
+                    // info!("Cancelling a non-top {:?} at {}, best is {}", stage, order.price, best);
+                    Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+                }
             }
         }
         found_top
+    }
+
+    pub fn cancel_all(&mut self, stage: Stage) {
+        for (_, order) in
+        stage.aggress_mut(&mut self.opens, &mut self.closes).order_map.iter_mut()
+        .filter(|(_, ord)|
+        (ord.progress == OrderProgress::Init ||
+        ord.progress == OrderProgress::Resting ||
+        ord.progress == OrderProgress::PartiallyFilled) &&
+        !ord.cancel_in_flight) {
+            Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+        }
     }
 
     pub fn get_smallest_rebase_size(&self, stage: Stage) -> Option<D128> {
@@ -202,11 +216,11 @@ impl Position {
             Some(b) => {
                 found_rebases = FindCancelRes::Found;
                 if (b - top).abs() > limit {
-                    for (_, order) in stage.aggress_mut(&mut self.opens, &mut self.closes).order_map.iter_mut()
-                    .filter(|(_, ord)| ord.order_class == OrderClassification::Rebase && ord.can_cancel()) {
-                        found_rebases = FindCancelRes::Cancelled;
-
-                        Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+                    for (_, order) in stage.aggress_mut(&mut self.opens, &mut self.closes).order_map.iter_mut() {
+                        if order.order_class == OrderClassification::Rebase && order.can_cancel() {
+                            found_rebases = FindCancelRes::Cancelled;
+                            Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+                        }
                     }
                 }
                 found_rebases
@@ -263,7 +277,7 @@ impl Position {
             close_liqs: close_liqs,
             open_position: FinData::from(open_liqs.filled - close_liqs.filled),
             total_count: open_liqs.total_count + close_liqs.total_count,
-            remaining_count: self.pos_max_orders - open_liqs.total_count,
+            remaining_count: self.pos_max_orders - open_liqs.total_reserved.count,
             remaining_margin: self.pos_max_size - open_liqs.total_outstanding.inv,
             // active_delta: todo!(),
             // total_delta: todo!(),
@@ -274,6 +288,7 @@ impl Position {
         &mut self,
         order: OrderUpdateData
     ) {
+        let price = order.filled_price;
         match Stage::from_binance_side(order.side, order.position_side) {
             Stage::Entry => self.opens.ws_order(order),
             Stage::Exit => {
@@ -283,8 +298,9 @@ impl Position {
                     let prebate = pd.open_liqs.filled.liq - pd.close_liqs.filled.liq;
                     let rebate = pd.open_liqs.filled.rebate + pd.close_liqs.filled.rebate;
                     let pnl = prebate - rebate;
-                    info!("{}side CLOSED OUT: prebate pnl: {}, fee/rebates: {}, pnl: {}\n",
-                    self.side, prebate, rebate, pnl);
+                    // info!("{}side CLOSED OUT: prebate pnl: {}, fee/rebates: {}, pnl: {}\n",
+                    // self.side, prebate, rebate, pnl);
+                    self.cancel_distant_rebases(price, D128::ZERO, Stage::Entry);
                     self.opens.clean();
                     self.closes.clean();
                     // info!("post clean: {}", self.data_refresh());
@@ -315,6 +331,14 @@ impl Position {
         self.known_prebate_pnl = position.accumulated_realized;
     }
 
+    pub fn balance_update(&mut self, balance: D128) {
+        self.pos_max_size = balance * D128::from(0.8) / D128::from(2);
+    }
+
+    pub fn balance_refresh(&mut self, balance: D128) {
+        self.pos_max_size = balance * D128::from(0.8) / D128::from(2);
+    }
+
     pub fn new_limit(
         &mut self,
         id: Option<Uuid>, price: D128,
@@ -324,7 +348,7 @@ impl Position {
         rem_margin: D128,
         rem_count: D128,
     ) -> bool {
-        if stage == Stage::Entry && (size > rem_margin || D128::ONE > rem_count) {
+        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > rem_margin || D128::ONE > rem_count) {
             // debug!("posrej {} rem: {}, count: {}", self.side, rem_margin, rem_count);
             return false;
         }
@@ -361,7 +385,7 @@ impl Position {
         rem_margin: D128,
         rem_count: D128,
     ) -> bool {
-        if stage == Stage::Entry && (size > rem_margin || D128::ONE >= rem_count) { return false; }
+        if stage == Stage::Entry && class == OrderClassification::Rebase && (size > rem_margin || D128::ONE >= rem_count) { return false; }
         let ord = Order::new_taker(id, expected_price, size, class);
         match stage {
             Stage::Entry => {

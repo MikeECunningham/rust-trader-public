@@ -1,6 +1,7 @@
 mod create_order;
 mod cancel_order;
 mod handle_error;
+mod account_info;
 mod info;
 
 use std::{sync::RwLock, time::{SystemTime, UNIX_EPOCH}};
