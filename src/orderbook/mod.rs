@@ -542,7 +542,7 @@ impl OrderBook {
                             OrderBookKey { key: price },
                             OrderBookValue {
                                 volume: vol,
-                                liquidity: D128::from(vol * price),
+                                liquidity: vol * price,
                                 // liquidity_stats: RegularStats::init(timestamp, vol * price),
                                 timestamp,
                                 sequence,
@@ -565,7 +565,7 @@ impl OrderBook {
                             OrderBookKey { key: price },
                             OrderBookValue {
                                 volume: vol,
-                                liquidity: D128::from(vol * price),
+                                liquidity: vol * price,
                                 // liquidity_stats: RegularStats::init(timestamp, vol * price),
                                 timestamp,
                                 sequence,
@@ -595,7 +595,7 @@ impl OrderBook {
                     OrderBookKey { key: price },
                     OrderBookValue {
                         volume: vol,
-                        liquidity: D128::from(vol * price),
+                        liquidity: vol * price,
                         // liquidity_stats: RegularStats::init(timestamp, vol * price),
                         // total_liquidity: D128::ZERO,
                         timestamp,
@@ -607,7 +607,7 @@ impl OrderBook {
                     OrderBookKey { key: price },
                     OrderBookValue {
                         volume: vol,
-                        liquidity: D128::from(vol * price),
+                        liquidity: vol * price,
                         // liquidity_stats: RegularStats::init(timestamp, vol * price),
                         timestamp,
                         sequence,

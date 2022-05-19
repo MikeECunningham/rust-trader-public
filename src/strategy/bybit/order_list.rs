@@ -77,7 +77,7 @@ impl OrderData {
 
     pub fn neutral_cb(&self, rebate: D128) -> D128 {
         ( self.inv * self.prebate_cb * rebate )
-        / ( ( D128::from(2) * self.inv ) - ( self.inv * rebate ) )
+        / ( ( 2 * self.inv ) - ( self.inv * rebate ) )
     }
 }
 

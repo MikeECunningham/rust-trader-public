@@ -413,7 +413,7 @@ impl Order {
             auto_gen: false,
             price: expected_price,
             size,
-            expected_fee: expected_price * size * D128::from(0.00075),
+            expected_fee: expected_price * size * 0.00075,
             in_flight: false,
             cancel_in_flight: false,
             unfilled_size: size,
@@ -435,7 +435,7 @@ impl Order {
         class: OrderClassification,
     ) -> Order {
         let mut ord = Order::new_taker(id, price, size, class);
-        ord.expected_fee = price * size * *REBATE * D128::from(-1);
+        ord.expected_fee = price * size * *REBATE * -1;
         ord.time_in_force = TimeInForce::PostOnly;
         ord.order_type = OrderType::Limit;
         ord.unfilled_liq = ord.price * ord.size;
