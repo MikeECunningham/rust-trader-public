@@ -24,7 +24,7 @@ impl Broker {
             .text()
             .await
             .expect("err");
-        info!("acc bal {}", balance_res);
+        // info!("acc bal {}", balance_res);
         let balances = serde_json::from_str::<AccountBalanceWrapper>(&balance_res).expect("err deser acc bal");
         match &balances {
             AccountBalanceWrapper::Balance(_) => {},

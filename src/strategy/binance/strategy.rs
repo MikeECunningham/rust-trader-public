@@ -304,7 +304,7 @@ impl Strategy {
     }
 
     pub fn balance_refresh(&mut self, balances: Vec<AccountBalance>) {
-        info!("{:?}", balances);
+        // info!("{:?}", balances);
         for balance in balances {
             if balance.asset == "BUSD" {
                 self.asset_portfolio.balance_refresh(balance);
