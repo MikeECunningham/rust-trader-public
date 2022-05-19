@@ -285,8 +285,8 @@ impl Position {
                     let prebate = pd.open_liqs.filled.liq - pd.close_liqs.filled.liq;
                     let rebate = pd.open_liqs.filled.rebate + pd.close_liqs.filled.rebate;
                     let pnl = prebate - rebate;
-                    info!("{}side CLOSED OUT: prebate pnl: {}, fee/rebates: {}, pnl: {}\n",
-                    self.side, prebate, rebate, pnl);
+                    // info!("{}side CLOSED OUT: prebate pnl: {}, fee/rebates: {}, pnl: {}\n",
+                    // self.side, prebate, rebate, pnl);
                     self.opens.clean();
                     self.closes.clean();
                     // info!("post clean: {}", self.data_refresh());
