@@ -1289,5 +1289,450 @@ impl<'de> serde::de::Deserialize<'de> for Decimal128 {
     }
 }
 
+// FLOAT 64 OP OVERLOADS
+impl Add<f64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn add(self, rhs: f64) -> Decimal128 {
+        Context::<Decimal128>::default().add(self, D128::from(rhs))
+    }
+}
+
+impl Add<Decimal128> for f64 {
+    type Output = Decimal128;
+
+    fn add(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().add(D128::from(self), rhs)
+    }
+}
+
+impl AddAssign<f64> for Decimal128 {
+    fn add_assign(&mut self, rhs: f64) {
+        *self = Context::<Decimal128>::default().add(*self, D128::from(rhs));
+    }
+}
+
+impl Div<f64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn div(self, rhs: f64) -> Decimal128 {
+        Context::<Decimal128>::default().div(self, D128::from(rhs))
+    }
+}
+
+impl Div<Decimal128> for f64 {
+    type Output = Decimal128;
+
+    fn div(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().div(D128::from(self), rhs)
+    }
+}
+
+impl DivAssign<f64> for Decimal128 {
+    fn div_assign(&mut self, rhs: f64) {
+        *self = Context::<Decimal128>::default().div(*self, D128::from(rhs));
+    }
+}
+
+impl Mul<f64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn mul(self, rhs: f64) -> Decimal128 {
+        Context::<Decimal128>::default().mul(self, D128::from(rhs))
+    }
+}
+
+impl Mul<Decimal128> for f64 {
+    type Output = Decimal128;
+
+    fn mul(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().mul(D128::from(self), rhs)
+    }
+}
+
+impl MulAssign<f64> for Decimal128 {
+    fn mul_assign(&mut self, rhs: f64) {
+        *self = Context::<Decimal128>::default().mul(*self, D128::from(rhs));
+    }
+}
+
+impl Rem<f64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn rem(self, rhs: f64) -> Decimal128 {
+        Context::<Decimal128>::default().rem(self, D128::from(rhs))
+    }
+}
+
+impl Rem<Decimal128> for f64 {
+    type Output = Decimal128;
+
+    fn rem(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().rem(D128::from(self), rhs)
+    }
+}
+
+impl RemAssign<f64> for Decimal128 {
+    fn rem_assign(&mut self, rhs: f64) {
+        *self = Context::<Decimal128>::default().rem(*self, D128::from(rhs));
+    }
+}
+
+impl Sub<f64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn sub(self, rhs: f64) -> Decimal128 {
+        Context::<Decimal128>::default().sub(self, D128::from(rhs))
+    }
+}
+
+impl Sub<Decimal128> for f64 {
+    type Output = Decimal128;
+
+    fn sub(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().sub(D128::from(self), rhs)
+    }
+}
+
+impl SubAssign<f64> for Decimal128 {
+    fn sub_assign(&mut self, rhs: f64) {
+        *self = Context::<Decimal128>::default().sub(*self, D128::from(rhs));
+    }
+}
+
+// INT OP OVERLOADS
+// i64
+impl Add<i64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn add(self, rhs: i64) -> Decimal128 {
+        Context::<Decimal128>::default().add(self, D128::from(rhs))
+    }
+}
+
+impl Div<i64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn div(self, rhs: i64) -> Decimal128 {
+        Context::<Decimal128>::default().div(self, D128::from(rhs))
+    }
+}
+
+impl Mul<i64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn mul(self, rhs: i64) -> Decimal128 {
+        Context::<Decimal128>::default().mul(self, D128::from(rhs))
+    }
+}
+
+impl Rem<i64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn rem(self, rhs: i64) -> Decimal128 {
+        Context::<Decimal128>::default().rem(self, D128::from(rhs))
+    }
+}
+
+impl Sub<i64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn sub(self, rhs: i64) -> Decimal128 {
+        Context::<Decimal128>::default().sub(self, D128::from(rhs))
+    }
+}
+
+impl Add<Decimal128> for i64 {
+    type Output = Decimal128;
+
+    fn add(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().add(D128::from(self), rhs)
+    }
+}
+
+impl Div<Decimal128> for i64 {
+    type Output = Decimal128;
+
+    fn div(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().div(D128::from(self), rhs)
+    }
+}
+
+impl Mul<Decimal128> for i64 {
+    type Output = Decimal128;
+
+    fn mul(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().mul(D128::from(self), rhs)
+    }
+}
+
+impl Rem<Decimal128> for i64 {
+    type Output = Decimal128;
+
+    fn rem(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().rem(D128::from(self), rhs)
+    }
+}
+
+impl Sub<Decimal128> for i64 {
+    type Output = Decimal128;
+
+    fn sub(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().sub(D128::from(self), rhs)
+    }
+}
+
+impl AddAssign<i64> for Decimal128 {
+    fn add_assign(&mut self, rhs: i64) {
+        *self = Context::<Decimal128>::default().add(*self, D128::from(rhs));
+    }
+}
+
+impl MulAssign<i64> for Decimal128 {
+    fn mul_assign(&mut self, rhs: i64) {
+        *self = Context::<Decimal128>::default().mul(*self, D128::from(rhs));
+    }
+}
+
+impl DivAssign<i64> for Decimal128 {
+    fn div_assign(&mut self, rhs: i64) {
+        *self = Context::<Decimal128>::default().div(*self, D128::from(rhs));
+    }
+}
+
+impl RemAssign<i64> for Decimal128 {
+    fn rem_assign(&mut self, rhs: i64) {
+        *self = Context::<Decimal128>::default().rem(*self, D128::from(rhs));
+    }
+}
+
+impl SubAssign<i64> for Decimal128 {
+    fn sub_assign(&mut self, rhs: i64) {
+        *self = Context::<Decimal128>::default().sub(*self, D128::from(rhs));
+    }
+}
+
+// u64
+impl Add<u64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn add(self, rhs: u64) -> Decimal128 {
+        Context::<Decimal128>::default().add(self, D128::from(rhs))
+    }
+}
+
+impl Div<u64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn div(self, rhs: u64) -> Decimal128 {
+        Context::<Decimal128>::default().div(self, D128::from(rhs))
+    }
+}
+
+impl Mul<u64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn mul(self, rhs: u64) -> Decimal128 {
+        Context::<Decimal128>::default().mul(self, D128::from(rhs))
+    }
+}
+
+impl Rem<u64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn rem(self, rhs: u64) -> Decimal128 {
+        Context::<Decimal128>::default().rem(self, D128::from(rhs))
+    }
+}
+
+impl Sub<u64> for Decimal128 {
+    type Output = Decimal128;
+
+    fn sub(self, rhs: u64) -> Decimal128 {
+        Context::<Decimal128>::default().sub(self, D128::from(rhs))
+    }
+}
+
+impl Add<Decimal128> for u64 {
+    type Output = Decimal128;
+
+    fn add(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().add(D128::from(self), rhs)
+    }
+}
+
+impl Div<Decimal128> for u64 {
+    type Output = Decimal128;
+
+    fn div(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().div(D128::from(self), rhs)
+    }
+}
+
+impl Mul<Decimal128> for u64 {
+    type Output = Decimal128;
+
+    fn mul(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().mul(D128::from(self), rhs)
+    }
+}
+
+impl Rem<Decimal128> for u64 {
+    type Output = Decimal128;
+
+    fn rem(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().rem(D128::from(self), rhs)
+    }
+}
+
+impl Sub<Decimal128> for u64 {
+    type Output = Decimal128;
+
+    fn sub(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().sub(D128::from(self), rhs)
+    }
+}
+
+impl AddAssign<u64> for Decimal128 {
+    fn add_assign(&mut self, rhs: u64) {
+        *self = Context::<Decimal128>::default().add(*self, D128::from(rhs));
+    }
+}
+
+impl MulAssign<u64> for Decimal128 {
+    fn mul_assign(&mut self, rhs: u64) {
+        *self = Context::<Decimal128>::default().mul(*self, D128::from(rhs));
+    }
+}
+
+impl DivAssign<u64> for Decimal128 {
+    fn div_assign(&mut self, rhs: u64) {
+        *self = Context::<Decimal128>::default().div(*self, D128::from(rhs));
+    }
+}
+
+impl RemAssign<u64> for Decimal128 {
+    fn rem_assign(&mut self, rhs: u64) {
+        *self = Context::<Decimal128>::default().rem(*self, D128::from(rhs));
+    }
+}
+
+impl SubAssign<u64> for Decimal128 {
+    fn sub_assign(&mut self, rhs: u64) {
+        *self = Context::<Decimal128>::default().sub(*self, D128::from(rhs));
+    }
+}
+
+// i32
+impl Add<i32> for Decimal128 {
+    type Output = Decimal128;
+
+    fn add(self, rhs: i32) -> Decimal128 {
+        Context::<Decimal128>::default().add(self, D128::from(rhs))
+    }
+}
+
+impl Div<i32> for Decimal128 {
+    type Output = Decimal128;
+
+    fn div(self, rhs: i32) -> Decimal128 {
+        Context::<Decimal128>::default().div(self, D128::from(rhs))
+    }
+}
+
+impl Mul<i32> for Decimal128 {
+    type Output = Decimal128;
+
+    fn mul(self, rhs: i32) -> Decimal128 {
+        Context::<Decimal128>::default().mul(self, D128::from(rhs))
+    }
+}
+
+impl Rem<i32> for Decimal128 {
+    type Output = Decimal128;
+
+    fn rem(self, rhs: i32) -> Decimal128 {
+        Context::<Decimal128>::default().rem(self, D128::from(rhs))
+    }
+}
+
+impl Sub<i32> for Decimal128 {
+    type Output = Decimal128;
+
+    fn sub(self, rhs: i32) -> Decimal128 {
+        Context::<Decimal128>::default().sub(self, D128::from(rhs))
+    }
+}
+
+impl Add<Decimal128> for i32 {
+    type Output = Decimal128;
+
+    fn add(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().add(D128::from(self), rhs)
+    }
+}
+
+impl Div<Decimal128> for i32 {
+    type Output = Decimal128;
+
+    fn div(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().div(D128::from(self), rhs)
+    }
+}
+
+impl Mul<Decimal128> for i32 {
+    type Output = Decimal128;
+
+    fn mul(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().mul(D128::from(self), rhs)
+    }
+}
+
+impl Rem<Decimal128> for i32 {
+    type Output = Decimal128;
+
+    fn rem(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().rem(D128::from(self), rhs)
+    }
+}
+
+impl Sub<Decimal128> for i32 {
+    type Output = Decimal128;
+
+    fn sub(self, rhs: Decimal128) -> Decimal128 {
+        Context::<Decimal128>::default().sub(D128::from(self), rhs)
+    }
+}
+
+impl AddAssign<i32> for Decimal128 {
+    fn add_assign(&mut self, rhs: i32) {
+        *self = Context::<Decimal128>::default().add(*self, D128::from(rhs));
+    }
+}
+
+impl MulAssign<i32> for Decimal128 {
+    fn mul_assign(&mut self, rhs: i32) {
+        *self = Context::<Decimal128>::default().mul(*self, D128::from(rhs));
+    }
+}
+
+impl DivAssign<i32> for Decimal128 {
+    fn div_assign(&mut self, rhs: i32) {
+        *self = Context::<Decimal128>::default().div(*self, D128::from(rhs));
+    }
+}
+
+impl RemAssign<i32> for Decimal128 {
+    fn rem_assign(&mut self, rhs: i32) {
+        *self = Context::<Decimal128>::default().rem(*self, D128::from(rhs));
+    }
+}
+
+impl SubAssign<i32> for Decimal128 {
+    fn sub_assign(&mut self, rhs: i32) {
+        *self = Context::<Decimal128>::default().sub(*self, D128::from(rhs));
+    }
+}
+
 /// Handy shorthand for Decimal128
 pub type D128 = Decimal128;
