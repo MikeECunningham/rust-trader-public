@@ -188,6 +188,18 @@ impl Position {
         found_top
     }
 
+    pub fn cancel_all(&mut self, stage: Stage) {
+        for (_, order) in
+        stage.aggress_mut(&mut self.opens, &mut self.closes).order_map.iter_mut()
+        .filter(|(_, ord)|
+        (ord.progress == OrderProgress::Init ||
+        ord.progress == OrderProgress::Resting ||
+        ord.progress == OrderProgress::PartiallyFilled) &&
+        !ord.cancel_in_flight) {
+            Position::send_cancel(self.pool.clone(), order, self.side, stage, self.symbol.clone(), self.strat_tx.clone());
+        }
+    }
+
     pub fn get_smallest_rebase_size(&self, stage: Stage) -> Option<D128> {
         match stage.aggress(&self.opens, &self.closes)
         .order_map.iter()
@@ -276,6 +288,7 @@ impl Position {
         &mut self,
         order: OrderUpdateData
     ) {
+        let price = order.filled_price;
         match Stage::from_binance_side(order.side, order.position_side) {
             Stage::Entry => self.opens.ws_order(order),
             Stage::Exit => {
@@ -287,6 +300,7 @@ impl Position {
                     let pnl = prebate - rebate;
                     // info!("{}side CLOSED OUT: prebate pnl: {}, fee/rebates: {}, pnl: {}\n",
                     // self.side, prebate, rebate, pnl);
+                    self.cancel_distant_rebases(price, D128::ZERO, Stage::Entry);
                     self.opens.clean();
                     self.closes.clean();
                     // info!("post clean: {}", self.data_refresh());
