@@ -47,7 +47,7 @@ fn main() {
 }
 
 fn automated_entrypoint_binance() {
-    info!("Binance entrypoint go!");
+    info!("Binance entrypoint");
     let accounts = vec![
         BinanceCredentials {
             binance_key: CONFIG.binance_key.clone(),
