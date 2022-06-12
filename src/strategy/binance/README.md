@@ -6,7 +6,7 @@ The account model is divided by concern:
 1. Account will hold strategies for each symbol, which is TODO.
 2. Strategies hold a portfolio that they act on, representing all broker actions to be taken on a market for a symbol.
 3. Portfolios are always in hedge mode, and internally relate the long position to the short position.
-4. Positions relate lists of "opening" (inventory accumulating) orders to lists of "closing" (inventory reducingg orders).
+4. Positions relate lists of "opening" (inventory accumulating) orders to lists of "closing" (inventory reducing) orders.
 5. Order lists hold, maintain, relate and examine orders at any state in an order's lifespan.
 6. Orders represent individual orders. Orders have life stages, from "in flight" to resting, partially filled, filled, or failed/cancelled in some way. They also have internal states which relate to the demo strategy. Orders can be limit or market, it's the same type for each.
 
