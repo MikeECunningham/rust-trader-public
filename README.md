@@ -11,6 +11,7 @@ The implementation of insightful analysis and profitable strategies is left as a
 6. Run `cargo run --release`
 
 Further info can be found in directory READMEs.
+You may need to delete rust-toolchain.toml and manually set rust to nightly in CLI depending on your environment.
 
 
 ### DISCLAIMER
