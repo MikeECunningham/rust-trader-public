@@ -37,6 +37,7 @@ mimalloc = { version = "*", default-features = false }
 crossbeam = { version = "0.8.1" }
 crossbeam-channel = { version = "0.5.2" }
 serde_urlencoded = "0.7"
+crypto-orderbook = { version = "0.5.2", default-features = false }
 
 # [target."cfg(debug_assertions)".dependencies]
 # console_error_panic_hook = "0.1.5"

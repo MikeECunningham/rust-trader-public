@@ -6,6 +6,8 @@ use crate::analysis::stats::RegularStats;
 use crate::backend::binance::types::{Orders, BookRefresh, BestLevel, BinanceSide};
 use crate::backend::bybit::stream::{OBTickData, BybitTickTypes};
 use crate::backend::types::Exchange;
+use crypto_orderbook::DepthUpdate;
+use crypto_orderbook::orderbook::sync::{handshake, live, Handshake, Live, Market};
 
 use serde::ser::{Serialize, SerializeMap, SerializeStruct, Serializer};
 use std::fmt::{Display, Formatter};
@@ -413,8 +415,23 @@ impl OrderBook {
     pub fn binance_update(&mut self, update: Orders) {
         self.exchange_check(Exchange::Binance);
 
-        if !(update.first_update_id <= self.last_sequence && update.last_update_id >= self.last_sequence) {
-            // We need to refresh the Orderbook to catch missing pieces
+        if self.initialized {
+            let ids = DepthUpdate {
+                first_update_id: update.first_update_id,
+                last_update_id: update.last_update_id,
+                prev_last_update_id: Some(update.last_stream_final_update_id),
+                bids: Vec::new(),
+                asks: Vec::new(),
+            };
+            let joins_snapshot = handshake(Market::UsdM, self.last_sequence, &ids) == Handshake::Apply;
+            if let Live::Gap { expected, got } = live(Market::UsdM, self.last_sequence, &ids) {
+                if !joins_snapshot {
+                    // A diff was missed: the book is wrong until the next snapshot.
+                    eprintln!("orderbook gap: pu {} != last u {}, waiting for a snapshot", got, expected);
+                    self.initialized = false;
+                    return;
+                }
+            }
         }
 
         for (price, quantity) in update.bids.iter() {
@@ -634,5 +651,51 @@ impl OrderBook {
         //     self.find_best_ask().expect("couldn't get a best ask ").key,
         //     self.find_best_bid().expect("couldn't get a best bid ").key
         // );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn d(s: &str) -> D128 {
+        D128::from_str(s).unwrap()
+    }
+
+    fn diff(first: u64, last: u64, pu: u64, bid: (&str, &str)) -> Orders {
+        Orders {
+            event_type: "depthUpdate".to_string(),
+            event_time: 0,
+            transaction_time: 0,
+            symbol: "BTCUSDT".to_string(),
+            first_update_id: first,
+            last_update_id: last,
+            last_stream_final_update_id: pu,
+            bids: vec![(d(bid.0), d(bid.1))],
+            asks: vec![],
+            test_timer: Instant::now(),
+        }
+    }
+
+    #[test]
+    fn binance_update_stops_at_a_gap() {
+        let mut ob = OrderBook::new();
+        ob.binance_refresh(BookRefresh {
+            last_update_id: 100,
+            message_output_time: 0,
+            transaction_time: 0,
+            bids: vec![(d("10"), d("1"))],
+            asks: vec![(d("11"), d("1"))],
+        });
+
+        ob.binance_update(diff(95, 105, 94, ("10", "2")));
+        ob.binance_update(diff(106, 110, 105, ("10", "3")));
+        assert!(ob.initialized);
+        assert_eq!(ob.last_sequence, 110);
+
+        // pu 115 != 110: the diff covering 111..=115 never arrived.
+        ob.binance_update(diff(116, 120, 115, ("10", "9")));
+        assert!(!ob.initialized);
+        assert_eq!(ob.bids.book[&OrderBookKey { key: d("10") }].volume, d("3"));
     }
 }
