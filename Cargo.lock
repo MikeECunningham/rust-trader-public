@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "arrayvec"
+version = "0.7.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3fb67a6e08acf24fdeccbac2cb6ac4305825bd1f117462e0e6f2f193345ad56"
+
+[[package]]
 name = "async-tungstenite"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -187,6 +193,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "683d6b536309245c849479fba3da410962a43ed8e51c26b729208ec0ac2798d0"
 dependencies = [
  "generic-array",
+]
+
+[[package]]
+name = "crypto-orderbook"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4c2f0f37afe7b4917a91bd7edf8a9854fb9118385e7e85fa75e2a7209dee6ec"
+dependencies = [
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]
@@ -746,6 +765,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "num-traits"
+version = "0.2.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
+dependencies = [
+ "autocfg",
+]
+
+[[package]]
 name = "num_cpus"
 version = "1.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1004,6 +1032,27 @@ dependencies = [
  "untrusted",
  "web-sys",
  "winapi",
+]
+
+[[package]]
+name = "rust_decimal"
+version = "1.26.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee9164faf726e4f3ece4978b25ca877ddc6802fa77f38cdccb32c7f805ecd70c"
+dependencies = [
+ "arrayvec",
+ "num-traits",
+ "serde",
+]
+
+[[package]]
+name = "rust_decimal_macros"
+version = "1.26.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4903d8db81d2321699ca8318035d6ff805c548868df435813968795a802171b2"
+dependencies = [
+ "quote",
+ "rust_decimal",
 ]
 
 [[package]]
@@ -1412,6 +1461,7 @@ dependencies = [
  "async-tungstenite",
  "crossbeam",
  "crossbeam-channel",
+ "crypto-orderbook",
  "csv",
  "dec",
  "enum-map",
